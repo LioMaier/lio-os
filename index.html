@@ -262,6 +262,7 @@ textarea.inp{resize:vertical;min-height:70px}select.inp{cursor:pointer}
     <button class="sb-item" onclick="nav('reisen')"><span class="si-icon">◒</span><span class="si-text">Reisen</span></button>
     <button class="sb-item" onclick="nav('kalender')"><span class="si-icon">◫</span><span class="si-text">Kalender</span></button>
     <button class="sb-item" onclick="nav('journal')"><span class="si-icon">▤</span><span class="si-text">Journal</span></button>
+    <button class="sb-item" onclick="nav('verlauf')"><span class="si-icon">▦</span><span class="si-text">Tages-Verlauf</span></button>
     <button class="sb-item" onclick="nav('wochenreview')"><span class="si-icon">◭</span><span class="si-text">Wochen-Review</span></button>
   </div>
   <div class="sb-footer" id="sb-date">—</div>
@@ -619,6 +620,32 @@ textarea.inp{resize:vertical;min-height:70px}select.inp{cursor:pointer}
       <div id="wr-list"></div>
     </div>
 
+    <!-- VERLAUF -->
+    <div class="page" id="page-verlauf">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div>
+          <div style="font-size:16px;font-weight:600">Tages-Verlauf</div>
+          <div style="font-size:10px;color:var(--muted);font-family:JetBrains Mono,monospace;margin-top:2px">Alle Tage gespeichert</div>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="saveTodayManual()">&#128190; Heute speichern</button>
+      </div>
+      <!-- Stats Übersicht -->
+      <div class="stat-row" style="grid-template-columns:repeat(3,1fr)">
+        <div class="stat s-green"><div class="stat-lbl">Tage gespeichert</div><div class="stat-val" id="vl-total">0</div><div class="stat-sub">Gesamt</div></div>
+        <div class="stat s-accent"><div class="stat-lbl">Ø Protein</div><div class="stat-val" id="vl-avg-p">0g</div><div class="stat-sub">pro Tag</div></div>
+        <div class="stat s-amber"><div class="stat-lbl">Ø Score</div><div class="stat-val" id="vl-avg-s">0</div><div class="stat-sub">pro Tag</div></div>
+      </div>
+      <!-- Filter -->
+      <div style="display:flex;gap:6px;margin-bottom:13px;flex-wrap:wrap">
+        <button class="ftab active" onclick="setVlFilter(7,this)">7 Tage</button>
+        <button class="ftab" onclick="setVlFilter(30,this)">30 Tage</button>
+        <button class="ftab" onclick="setVlFilter(90,this)">90 Tage</button>
+        <button class="ftab" onclick="setVlFilter(0,this)">Alle</button>
+      </div>
+      <!-- Verlauf Liste -->
+      <div id="verlauf-list"></div>
+    </div>
+
     <!-- KALENDER -->
     <div class="page" id="page-kalender">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
@@ -693,6 +720,7 @@ textarea.inp{resize:vertical;min-height:70px}select.inp{cursor:pointer}
       <button onclick="navMehr('reisen')" class="mehr-btn">◒<br>Reisen</button>
       <button onclick="navMehr('journal')" class="mehr-btn">▤<br>Journal</button>
       <button onclick="navMehr('wochenreview')" class="mehr-btn">◭<br>Review</button>
+      <button onclick="navMehr('verlauf')" class="mehr-btn">▦<br>Verlauf</button>
     </div>
   </div>
 </div>
@@ -787,7 +815,7 @@ function nav(page){
   pg.classList.add('active');
   pg.style.display='block';
   document.querySelectorAll('[onclick="nav(\''+page+'\')"]').forEach(function(el){el.classList.add('active');});
-  var titles={dashboard:'Dashboard',daily:'Daily',gym:'Gym',nutrition:'Ernaehrung',skin:'Haut',sleep:'Schlaf',goals:'Ziele',finance:'Finanzen',invest:'Investieren',business:'Business',lernstoff:'Elektro Lernstoff',sprachen:'Sprachen',reisen:'Reisen',journal:'Journal',wochenreview:'Wochen-Review',kalender:'Kalender'};
+  var titles={dashboard:'Dashboard',daily:'Daily',gym:'Gym',nutrition:'Ernaehrung',skin:'Haut',sleep:'Schlaf',goals:'Ziele',finance:'Finanzen',invest:'Investieren',business:'Business',lernstoff:'Elektro Lernstoff',sprachen:'Sprachen',reisen:'Reisen',journal:'Journal',wochenreview:'Wochen-Review',kalender:'Kalender',verlauf:'Tages-Verlauf'};
   document.getElementById('page-title').textContent=titles[page]||page;
   renderPage(page);
 }
@@ -818,6 +846,7 @@ function renderPage(p){
   else if(p==='journal')renderJournal();
   else if(p==='wochenreview')renderWR();
   else if(p==='kalender')renderKal();
+  else if(p==='verlauf')renderVerlauf();
 }
 function renderDash(){
   var d=new Date();
@@ -1303,6 +1332,153 @@ function renderUpcoming(){
   }).join('');
 }
 // ─── END KALENDER ───────────────────────────────
+
+// ─── TAGES-VERLAUF ───────────────────────────────
+var vlFilter = 7;
+
+function saveDayToVerlauf() {
+  var records = S.get('verlauf', []);
+  var dateKey = today;
+  // Remove existing entry for today if exists
+  records = records.filter(function(r) { return r.date !== dateKey; });
+  var score = calcScore();
+  records.push({
+    date: dateKey,
+    protein: state.protein,
+    kcal: state.kcal,
+    carbs: state.carbs,
+    fat: state.fat,
+    water: state.water,
+    gym: state.gymDays.indexOf(dateKey) > -1,
+    krank: state.kranDays.indexOf(dateKey) > -1,
+    schlafH: (function() {
+      var last = state.sleepLog && state.sleepLog.length ? state.sleepLog[state.sleepLog.length-1] : null;
+      return last ? last.hours : 0;
+    })(),
+    score: score,
+    streak: state.streak,
+    weight: state.weight,
+    focus: S.get('focus_' + dateKey, '')
+  });
+  // Keep max 365 days
+  records.sort(function(a,b){return a.date.localeCompare(b.date);});
+  if(records.length > 365) records = records.slice(-365);
+  S.set('verlauf', records);
+}
+
+function saveTodayManual() {
+  saveDayToVerlauf();
+  renderVerlauf();
+  // Show feedback
+  var btn = event.target;
+  var orig = btn.textContent;
+  btn.textContent = '✓ Gespeichert!';
+  btn.style.color = 'var(--green)';
+  setTimeout(function() { btn.textContent = orig; btn.style.color = ''; }, 2000);
+}
+
+function setVlFilter(days, btn) {
+  vlFilter = days;
+  document.querySelectorAll('#page-verlauf .ftab').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  renderVerlauf();
+}
+
+function renderVerlauf() {
+  var records = S.get('verlauf', []);
+  
+  // Auto-save today if not already saved
+  var todayExists = records.some(function(r) { return r.date === today; });
+  if(!todayExists && (state.protein > 0 || state.gymDays.indexOf(today) > -1)) {
+    saveDayToVerlauf();
+    records = S.get('verlauf', []);
+  }
+
+  // Filter
+  var filtered = records;
+  if(vlFilter > 0) {
+    var cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - vlFilter);
+    var cutoffStr = cutoff.toDateString();
+    filtered = records.filter(function(r) {
+      return new Date(r.date) >= new Date(cutoffStr);
+    });
+  }
+  filtered = filtered.slice().reverse(); // newest first
+
+  // Stats
+  var total = records.length;
+  var avgP = total ? Math.round(records.reduce(function(a,r){return a+r.protein;},0)/total) : 0;
+  var avgS = total ? Math.round(records.reduce(function(a,r){return a+r.score;},0)/total) : 0;
+  var te = document.getElementById('vl-total'); if(te) te.textContent = total;
+  var pe = document.getElementById('vl-avg-p'); if(pe) pe.textContent = avgP+'g';
+  var se = document.getElementById('vl-avg-s'); if(se) se.textContent = avgS;
+
+  // List
+  var el = document.getElementById('verlauf-list');
+  if(!el) return;
+  if(!filtered.length) {
+    el.innerHTML = '<div class="card" style="text-align:center;padding:28px;color:var(--muted);font-size:13px">Noch keine Daten. Tipp auf "Heute speichern" oder nutze die App den ganzen Tag.</div>';
+    return;
+  }
+
+  var days = ['So','Mo','Di','Mi','Do','Fr','Sa'];
+  var months = ['Jan','Feb','Mar','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+
+  el.innerHTML = filtered.map(function(r) {
+    var d = new Date(r.date);
+    var dateStr = days[d.getDay()] + ', ' + d.getDate() + '. ' + months[d.getMonth()];
+    var isToday = r.date === today;
+    
+    var scoreColor = r.score >= 80 ? 'var(--green)' : r.score >= 60 ? 'var(--amber)' : 'var(--red)';
+    var gymBadge = r.krank 
+      ? '<span class="tag t-red">Krank</span>'
+      : r.gym 
+        ? '<span class="tag t-green">Gym ✓</span>'
+        : '<span class="tag" style="background:var(--bg4);color:var(--muted)">Kein Gym</span>';
+
+    var proteinPct = Math.min(100, Math.round(r.protein/150*100));
+    var proteinColor = proteinPct >= 90 ? 'var(--green)' : proteinPct >= 60 ? 'var(--amber)' : 'var(--red)';
+    var kcalPct = Math.min(100, Math.round(r.kcal/2600*100));
+    var waterPct = Math.min(100, Math.round(r.water/8*100));
+
+    return '<div class="card" style="margin-bottom:10px'+(isToday?';border-color:rgba(74,158,255,.3)':'')+'">'
+      + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">'
+      + '<div>'
+      + '<div style="font-size:13px;font-weight:600">' + dateStr + (isToday?' <span style="font-size:9px;color:var(--accent);font-family:JetBrains Mono,monospace">HEUTE</span>':'') + '</div>'
+      + (r.focus ? '<div style="font-size:10px;color:var(--muted);margin-top:2px;font-style:italic">"'+r.focus+'"</div>' : '')
+      + '</div>'
+      + '<div style="display:flex;align-items:center;gap:8px">'
+      + gymBadge
+      + '<div style="font-size:20px;font-weight:700;font-family:JetBrains Mono,monospace;color:'+scoreColor+'">'+r.score+'</div>'
+      + '</div></div>'
+      // Macros bars
+      + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">'
+      // Protein
+      + '<div><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span style="color:var(--text2)">Protein</span><span style="font-family:JetBrains Mono,monospace;font-size:10px;color:'+proteinColor+'">'+r.protein+'g</span></div>'
+      + '<div class="prog-bar"><div class="prog-fill pf-blue" style="width:'+proteinPct+'%;background:'+proteinColor+'"></div></div></div>'
+      // Kalorien
+      + '<div><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span style="color:var(--text2)">Kalorien</span><span style="font-family:JetBrains Mono,monospace;font-size:10px;color:var(--amber)">'+r.kcal+'</span></div>'
+      + '<div class="prog-bar"><div class="prog-fill pf-amber" style="width:'+kcalPct+'%"></div></div></div>'
+      // Wasser
+      + '<div><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span style="color:var(--text2)">Wasser</span><span style="font-family:JetBrains Mono,monospace;font-size:10px;color:var(--teal)">'+r.water+'/8</span></div>'
+      + '<div class="prog-bar"><div class="prog-fill pf-teal" style="width:'+waterPct+'%"></div></div></div>'
+      // Schlaf
+      + '<div><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span style="color:var(--text2)">Schlaf</span><span style="font-family:JetBrains Mono,monospace;font-size:10px;color:var(--purple)">'+(r.schlafH||0)+'h</span></div>'
+      + '<div class="prog-bar"><div class="prog-fill pf-purple" style="width:'+Math.min(100,Math.round((r.schlafH||0)/8*100))+'%"></div></div></div>'
+      + '</div>'
+      // Carbs + Fat inline
+      + '<div style="display:flex;gap:10px;font-size:10px;font-family:JetBrains Mono,monospace;color:var(--muted)">'
+      + '<span>Carbs: <span style="color:var(--text2)">'+r.carbs+'g</span></span>'
+      + '<span>Fett: <span style="color:var(--text2)">'+r.fat+'g</span></span>'
+      + '<span>Streak: <span style="color:var(--amber)">'+r.streak+'&#128293;</span></span>'
+      + (r.weight ? '<span>Gewicht: <span style="color:var(--text2)">'+r.weight+'kg</span></span>' : '')
+      + '</div>'
+      + '</div>';
+  }).join('');
+}
+// ─── END VERLAUF ─────────────────────────────────
+
 
 </script>
 </body>
