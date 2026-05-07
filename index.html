@@ -20,10 +20,10 @@
   --r:10px;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;background:var(--bg);color:var(--text);font-family:"DM Sans",sans-serif;font-size:15px;overflow:hidden}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:"DM Sans",sans-serif;font-size:15px;overflow:hidden}@media(max-width:768px){html,body{overflow:auto;height:auto}}
 ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:var(--dim);border-radius:2px}
 button{font-family:"DM Sans",sans-serif;cursor:pointer;border:none;background:none;color:var(--text)}
-.app{display:flex;height:100vh}
+.app{display:flex;height:100vh}@media(max-width:768px){.app{height:auto;min-height:100vh;flex-direction:column}}
 .sidebar{width:230px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0}
 .sb-top{padding:18px 16px 12px;border-bottom:1px solid var(--border)}
 .sb-logo{font-family:"Syne",sans-serif;font-size:18px;font-weight:800}.sb-logo span{color:var(--accent)}
@@ -39,8 +39,8 @@ button{font-family:"DM Sans",sans-serif;cursor:pointer;border:none;background:no
 .sb-item .si-icon{font-size:13px;width:16px;text-align:center;flex-shrink:0}
 .sb-item .si-text{font-size:12.5px;color:var(--text2);flex:1}.sb-item.active .si-text{color:var(--text)}
 .sb-footer{padding:10px 14px;border-top:1px solid var(--border);font-size:10px;color:var(--muted);font-family:"JetBrains Mono",monospace}
-.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
-.topbar{padding:0 24px;height:52px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--bg2);flex-shrink:0}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}@media(max-width:768px){.main{overflow:visible}}
+.topbar{padding:0 24px;height:52px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--bg2);flex-shrink:0}@media(max-width:768px){.topbar{position:sticky;top:0;z-index:50}}
 .topbar-title{font-family:"Syne",sans-serif;font-size:15px;font-weight:700}
 .topbar-right{display:flex;align-items:center;gap:8px}
 .tb-badge{display:flex;align-items:center;gap:4px;padding:4px 9px;border-radius:20px;font-size:10px;font-weight:600;font-family:"JetBrains Mono",monospace}
@@ -48,7 +48,7 @@ button{font-family:"DM Sans",sans-serif;cursor:pointer;border:none;background:no
 .tb-blue{background:var(--a2);color:var(--accent);border:1px solid rgba(74,158,255,.2)}
 .tb-btn{padding:5px 11px;border-radius:6px;font-size:11px;background:var(--bg4);color:var(--text2);border:1px solid var(--border2);cursor:pointer;transition:all .15s}
 .tb-btn:hover{border-color:var(--border3);color:var(--text)}
-.content{flex:1;overflow-y:auto;padding:22px 26px}
+.content{flex:1;overflow-y:auto;padding:22px 26px}@media(max-width:768px){.content{overflow:visible;overflow-y:visible;padding:14px 14px 80px}}
 .page{display:none}.page.active{display:block}
 .stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
 .stat{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px}
@@ -118,7 +118,7 @@ textarea.inp{resize:vertical;min-height:70px}select.inp{cursor:pointer}
 .modal-title{font-size:14px;font-weight:600;margin-bottom:13px}
 .modal-footer{display:flex;gap:7px;justify-content:flex-end;margin-top:13px}
 /* LERN */
-.lern-wrap{display:flex;height:calc(100vh - 52px);margin:-22px -26px -22px -26px;overflow:hidden}
+.lern-wrap{display:flex;height:calc(100vh - 52px);margin:-22px -26px -22px -26px;overflow:hidden}@media(max-width:768px){.lern-wrap{height:auto;margin:0;flex-direction:column;overflow:visible}}
 .lern-nav{width:255px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden}
 .lern-filters{padding:8px 10px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:5px;flex-shrink:0}
 .filter-row{display:flex;gap:3px}
