@@ -20,10 +20,14 @@
   --r:10px;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;background:var(--bg);color:var(--text);font-family:"DM Sans",sans-serif;font-size:15px;overflow:hidden}@media(max-width:768px){html,body{overflow:auto;height:auto}}
+html{background:var(--bg);color:var(--text);font-family:"DM Sans",sans-serif;font-size:15px}
+body{background:var(--bg);color:var(--text);font-family:"DM Sans",sans-serif;font-size:15px;margin:0}
+@media(min-width:769px){html,body{height:100%;overflow:hidden}}
 ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:var(--dim);border-radius:2px}
 button{font-family:"DM Sans",sans-serif;cursor:pointer;border:none;background:none;color:var(--text)}
-.app{display:flex;height:100vh}@media(max-width:768px){.app{height:auto;min-height:100vh;flex-direction:column}}
+.app{display:flex}
+@media(min-width:769px){.app{height:100vh}}
+@media(max-width:768px){.app{flex-direction:column;min-height:100vh}}
 .sidebar{width:230px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0}
 .sb-top{padding:18px 16px 12px;border-bottom:1px solid var(--border)}
 .sb-logo{font-family:"Syne",sans-serif;font-size:18px;font-weight:800}.sb-logo span{color:var(--accent)}
@@ -32,14 +36,15 @@ button{font-family:"DM Sans",sans-serif;cursor:pointer;border:none;background:no
 .sb-prog-row{display:flex;justify-content:space-between;font-size:9px;font-family:"JetBrains Mono",monospace;color:var(--muted);margin-bottom:3px}
 .sb-prog-bar{height:2px;background:var(--dim);border-radius:1px;overflow:hidden}
 .sb-prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--teal));transition:width .5s}
-.sb-scroll{overflow-y:auto;flex:1;padding:6px 0}
+.sb-scroll{flex:1;padding:6px 0}@media(min-width:769px){.sb-scroll{overflow-y:auto}}
 .sb-section{padding:10px 14px 3px;font-size:9px;font-family:"JetBrains Mono",monospace;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
 .sb-item{display:flex;align-items:center;gap:8px;padding:8px 14px;cursor:pointer;border-left:2px solid transparent;transition:all .12s;width:100%;text-align:left}
 .sb-item:hover{background:var(--bg3)}.sb-item.active{background:var(--a3);border-left-color:var(--accent)}
 .sb-item .si-icon{font-size:13px;width:16px;text-align:center;flex-shrink:0}
 .sb-item .si-text{font-size:12.5px;color:var(--text2);flex:1}.sb-item.active .si-text{color:var(--text)}
 .sb-footer{padding:10px 14px;border-top:1px solid var(--border);font-size:10px;color:var(--muted);font-family:"JetBrains Mono",monospace}
-.main{flex:1;display:flex;flex-direction:column;overflow:hidden}@media(max-width:768px){.main{overflow:visible}}
+.main{flex:1;display:flex;flex-direction:column}
+@media(min-width:769px){.main{overflow:hidden}}
 .topbar{padding:0 24px;height:52px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--bg2);flex-shrink:0}@media(max-width:768px){.topbar{position:sticky;top:0;z-index:50}}
 .topbar-title{font-family:"Syne",sans-serif;font-size:15px;font-weight:700}
 .topbar-right{display:flex;align-items:center;gap:8px}
@@ -48,7 +53,9 @@ button{font-family:"DM Sans",sans-serif;cursor:pointer;border:none;background:no
 .tb-blue{background:var(--a2);color:var(--accent);border:1px solid rgba(74,158,255,.2)}
 .tb-btn{padding:5px 11px;border-radius:6px;font-size:11px;background:var(--bg4);color:var(--text2);border:1px solid var(--border2);cursor:pointer;transition:all .15s}
 .tb-btn:hover{border-color:var(--border3);color:var(--text)}
-.content{flex:1;overflow-y:auto;padding:22px 26px}@media(max-width:768px){.content{overflow:visible;overflow-y:visible;padding:14px 14px 80px}}
+.content{flex:1;padding:22px 26px}
+@media(min-width:769px){.content{overflow-y:auto}}
+@media(max-width:768px){.content{padding:14px 14px 80px}}
 .page{display:none}.page.active{display:block}
 .stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
 .stat{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px}
@@ -119,13 +126,13 @@ textarea.inp{resize:vertical;min-height:70px}select.inp{cursor:pointer}
 .modal-footer{display:flex;gap:7px;justify-content:flex-end;margin-top:13px}
 /* LERN */
 .lern-wrap{display:flex;height:calc(100vh - 52px);margin:-22px -26px -22px -26px;overflow:hidden}@media(max-width:768px){.lern-wrap{height:auto;margin:0;flex-direction:column;overflow:visible}}
-.lern-nav{width:255px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden}
+.lern-nav{width:255px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0}@media(min-width:769px){.lern-nav{overflow:hidden}}
 .lern-filters{padding:8px 10px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:5px;flex-shrink:0}
 .filter-row{display:flex;gap:3px}
 .ftab{flex:1;padding:4px 2px;font-size:9px;font-family:"JetBrains Mono",monospace;border-radius:4px;color:var(--muted);border:1px solid transparent;text-align:center;cursor:pointer;background:none;transition:all .15s}
 .ftab.active{background:var(--a2);color:var(--accent);border-color:rgba(74,158,255,.2)}
 .ftab:hover:not(.active){background:var(--bg3);color:var(--text2)}
-.lern-list{overflow-y:auto;flex:1}
+.lern-list{flex:1}@media(min-width:769px){.lern-list{overflow-y:auto}}
 .lg-head{padding:7px 11px 2px;font-size:9px;font-family:"JetBrains Mono",monospace;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;display:flex;align-items:center;gap:5px}
 .lg-cnt{background:var(--bg4);color:var(--muted);border-radius:3px;padding:1px 5px;font-size:9px}
 .lt-btn{display:flex;align-items:center;gap:7px;padding:7px 11px;width:100%;cursor:pointer;border-left:2px solid transparent;transition:all .12s;text-align:left;background:none;border-top:none;border-right:none;border-bottom:none}
@@ -136,7 +143,7 @@ textarea.inp{resize:vertical;min-height:70px}select.inp{cursor:pointer}
 .lt-btn.active .lt-name{color:var(--text)}
 .lt-meta{font-size:9px;color:var(--muted);font-family:"JetBrains Mono",monospace;margin-top:1px}
 .lt-done{font-size:10px;color:var(--green)}
-.lern-area{flex:1;overflow-y:auto;background:var(--bg)}
+.lern-area{flex:1;background:var(--bg)}@media(min-width:769px){.lern-area{overflow-y:auto}}
 .lern-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--muted);text-align:center;gap:12px}
 /* LERNSEITE */
 .lernseite{max-width:760px;margin:0 auto;padding:26px 30px 80px}
@@ -216,6 +223,9 @@ textarea.inp{resize:vertical;min-height:70px}select.inp{cursor:pointer}
 .upcoming-title{font-size:13px;color:var(--text)}
 .upcoming-sub{font-size:10px;color:var(--muted);margin-top:1px}
 .bn-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px 6px;font-size:8px;font-weight:600;color:var(--muted);letter-spacing:.04em;cursor:pointer;font-family:JetBrains Mono,monospace;transition:color .15s;border:none;background:none}
+.bn-btn.active{color:var(--accent)}
+.mehr-btn{display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 6px;border-radius:10px;font-size:9px;font-family:JetBrains Mono,monospace;color:var(--text2);background:var(--bg3);border:1px solid var(--border);cursor:pointer;transition:all .15s;line-height:1.4}
+.mehr-btn:hover,.mehr-btn:active{background:var(--a2);color:var(--accent);border-color:rgba(74,158,255,.3)}
 .bn-btn.active{color:var(--accent)}
 @media(max-width:768px){.sidebar{display:none}#bottom-nav{display:block!important}.stat-row{grid-template-columns:1fr 1fr}.grid-2{grid-template-columns:1fr}.lern-wrap{flex-direction:column;height:auto;margin:0}.lern-nav{width:100%;max-height:240px}.lern-area{min-height:60vh}.lernseite{padding:14px 12px 60px}.content{padding:14px;padding-bottom:75px}.app{height:auto;min-height:100vh}.main{overflow:visible}.content{overflow:visible}}
 </style>
@@ -663,14 +673,37 @@ textarea.inp{resize:vertical;min-height:70px}select.inp{cursor:pointer}
 </div>
 
 <!-- BOTTOM NAV (mobile) -->
+<div id="mehr-menu" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.6)" onclick="closeMehr()">
+  <div onclick="event.stopPropagation()" style="position:absolute;bottom:70px;left:0;right:0;background:var(--bg2);border-top:1px solid var(--border2);border-radius:16px 16px 0 0;padding:16px 12px 8px">
+    <div style="font-size:9px;font-family:JetBrains Mono,monospace;color:var(--muted);letter-spacing:.1em;margin-bottom:10px;padding:0 4px">ALLE SEITEN</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+      <button onclick="navMehr('dashboard')" class="mehr-btn">⬡<br>Home</button>
+      <button onclick="navMehr('daily')" class="mehr-btn">✓<br>Daily</button>
+      <button onclick="navMehr('gym')" class="mehr-btn">◈<br>Gym</button>
+      <button onclick="navMehr('nutrition')" class="mehr-btn">◉<br>Ernährung</button>
+      <button onclick="navMehr('skin')" class="mehr-btn">◌<br>Haut</button>
+      <button onclick="navMehr('sleep')" class="mehr-btn">◑<br>Schlaf</button>
+      <button onclick="navMehr('goals')" class="mehr-btn">◆<br>Ziele</button>
+      <button onclick="navMehr('finance')" class="mehr-btn">◇<br>Finanzen</button>
+      <button onclick="navMehr('invest')" class="mehr-btn">▲<br>Invest</button>
+      <button onclick="navMehr('business')" class="mehr-btn">▣<br>Business</button>
+      <button onclick="navMehr('lernstoff')" class="mehr-btn">⚡<br>Lernen</button>
+      <button onclick="navMehr('sprachen')" class="mehr-btn">◐<br>Sprachen</button>
+      <button onclick="navMehr('kalender')" class="mehr-btn">◫<br>Kalender</button>
+      <button onclick="navMehr('reisen')" class="mehr-btn">◒<br>Reisen</button>
+      <button onclick="navMehr('journal')" class="mehr-btn">▤<br>Journal</button>
+      <button onclick="navMehr('wochenreview')" class="mehr-btn">◭<br>Review</button>
+    </div>
+  </div>
+</div>
 <nav style="display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(4,8,15,.97);backdrop-filter:blur(20px);border-top:1px solid var(--border);z-index:100;padding-bottom:env(safe-area-inset-bottom,0)" id="bottom-nav">
   <div style="display:flex">
-    <button onclick="nav('dashboard')" class="bn-btn"><div style="font-size:18px">&#11041;</div><div>Home</div></button>
-    <button onclick="nav('daily')" class="bn-btn"><div style="font-size:18px">&#10003;</div><div>Daily</div></button>
-    <button onclick="nav('gym')" class="bn-btn"><div style="font-size:18px">&#11048;</div><div>Gym</div></button>
-    <button onclick="nav('kalender')" class="bn-btn"><div style="font-size:18px">&#11039;</div><div>Kalender</div></button>
-    <button onclick="nav('lernstoff')" class="bn-btn"><div style="font-size:18px">&#9889;</div><div>Lernen</div></button>
-    <button onclick="nav('finance')" class="bn-btn"><div style="font-size:18px">&#11042;</div><div>Money</div></button>
+    <button onclick="nav('dashboard')" class="bn-btn" id="bn-dashboard"><div style="font-size:18px">⬡</div><div>Home</div></button>
+    <button onclick="nav('daily')" class="bn-btn" id="bn-daily"><div style="font-size:18px">✓</div><div>Daily</div></button>
+    <button onclick="nav('gym')" class="bn-btn" id="bn-gym"><div style="font-size:18px">◈</div><div>Gym</div></button>
+    <button onclick="nav('lernstoff')" class="bn-btn" id="bn-lernstoff"><div style="font-size:18px">⚡</div><div>Lernen</div></button>
+    <button onclick="nav('kalender')" class="bn-btn" id="bn-kalender"><div style="font-size:18px">◫</div><div>Kalender</div></button>
+    <button onclick="openMehr()" class="bn-btn" id="bn-mehr"><div style="font-size:18px">⋯</div><div>Mehr</div></button>
   </div>
 </nav>
 
@@ -1101,6 +1134,10 @@ function nextThema(){
   var idx=THEMEN.findIndex(function(t){return t.id===lActive;});
   if(idx<THEMEN.length-1)openThema(THEMEN[idx+1].id);
 }
+// MEHR MENU
+function openMehr(){document.getElementById('mehr-menu').style.display='block';}
+function closeMehr(){document.getElementById('mehr-menu').style.display='none';}
+function navMehr(page){closeMehr();nav(page);}
 // INIT
 renderDash();
 renderTasks();
