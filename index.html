@@ -1,0 +1,1625 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lio OS</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#04080f;--bg2:#080e1a;--bg3:#0d1525;--bg4:#111d30;--bg5:#16243d;
+  --border:rgba(100,150,255,0.07);--border2:rgba(100,150,255,0.13);--border3:rgba(100,150,255,0.22);
+  --text:#e8eef8;--text2:#a0b0c8;--muted:#4a5a70;--dim:#1e2e45;
+  --accent:#4a9eff;--a2:rgba(74,158,255,0.12);--a3:rgba(74,158,255,0.06);
+  --green:#34d399;--g2:rgba(52,211,153,0.1);
+  --amber:#fbbf24;--am2:rgba(251,191,36,0.1);
+  --red:#f87171;--r2:rgba(248,113,113,0.1);
+  --purple:#c084fc;--p2:rgba(192,132,252,0.1);
+  --teal:#2dd4bf;--t2:rgba(45,212,191,0.1);
+  --orange:#fb923c;--o2:rgba(251,146,60,0.1);
+  --r:10px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{background:var(--bg);color:var(--text);font-family:"DM Sans",sans-serif;font-size:15px}
+body{background:var(--bg);color:var(--text);font-family:"DM Sans",sans-serif;font-size:15px;margin:0}
+@media(min-width:769px){html,body{height:100%;overflow:hidden}}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:var(--dim);border-radius:2px}
+button{font-family:"DM Sans",sans-serif;cursor:pointer;border:none;background:none;color:var(--text)}
+.app{display:flex}
+@media(min-width:769px){.app{height:100vh}}
+@media(max-width:768px){.app{flex-direction:column;min-height:100vh}}
+.sidebar{width:230px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0}
+.sb-top{padding:18px 16px 12px;border-bottom:1px solid var(--border)}
+.sb-logo{font-family:"Syne",sans-serif;font-size:18px;font-weight:800}.sb-logo span{color:var(--accent)}
+.sb-sub{font-size:9px;color:var(--muted);font-family:"JetBrains Mono",monospace;margin-top:1px}
+.sb-prog{margin-top:10px}
+.sb-prog-row{display:flex;justify-content:space-between;font-size:9px;font-family:"JetBrains Mono",monospace;color:var(--muted);margin-bottom:3px}
+.sb-prog-bar{height:2px;background:var(--dim);border-radius:1px;overflow:hidden}
+.sb-prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--teal));transition:width .5s}
+.sb-scroll{flex:1;padding:6px 0}@media(min-width:769px){.sb-scroll{overflow-y:auto}}
+.sb-section{padding:10px 14px 3px;font-size:9px;font-family:"JetBrains Mono",monospace;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
+.sb-item{display:flex;align-items:center;gap:8px;padding:8px 14px;cursor:pointer;border-left:2px solid transparent;transition:all .12s;width:100%;text-align:left}
+.sb-item:hover{background:var(--bg3)}.sb-item.active{background:var(--a3);border-left-color:var(--accent)}
+.sb-item .si-icon{font-size:13px;width:16px;text-align:center;flex-shrink:0}
+.sb-item .si-text{font-size:12.5px;color:var(--text2);flex:1}.sb-item.active .si-text{color:var(--text)}
+.sb-footer{padding:10px 14px;border-top:1px solid var(--border);font-size:10px;color:var(--muted);font-family:"JetBrains Mono",monospace}
+.main{flex:1;display:flex;flex-direction:column}
+@media(min-width:769px){.main{overflow:hidden}}
+.topbar{padding:0 24px;height:52px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--bg2);flex-shrink:0}@media(max-width:768px){.topbar{position:sticky;top:0;z-index:50}}
+.topbar-title{font-family:"Syne",sans-serif;font-size:15px;font-weight:700}
+.topbar-right{display:flex;align-items:center;gap:8px}
+.tb-badge{display:flex;align-items:center;gap:4px;padding:4px 9px;border-radius:20px;font-size:10px;font-weight:600;font-family:"JetBrains Mono",monospace}
+.tb-amber{background:var(--am2);color:var(--amber);border:1px solid rgba(251,191,36,.2)}
+.tb-blue{background:var(--a2);color:var(--accent);border:1px solid rgba(74,158,255,.2)}
+.tb-btn{padding:5px 11px;border-radius:6px;font-size:11px;background:var(--bg4);color:var(--text2);border:1px solid var(--border2);cursor:pointer;transition:all .15s}
+.tb-btn:hover{border-color:var(--border3);color:var(--text)}
+.content{flex:1;padding:22px 26px}
+@media(min-width:769px){.content{overflow-y:auto}}
+@media(max-width:768px){.content{padding:14px 14px 80px}}
+.page{display:none}.page.active{display:block}
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.stat{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px}
+.stat-lbl{font-size:9px;color:var(--muted);font-family:"JetBrains Mono",monospace;margin-bottom:4px}
+.stat-val{font-size:20px;font-weight:700;line-height:1}.stat-sub{font-size:10px;color:var(--muted);margin-top:3px}
+.s-accent{border-color:rgba(74,158,255,.25);background:var(--a3)}.s-green{border-color:rgba(52,211,153,.2);background:var(--g2)}
+.s-amber{border-color:rgba(251,191,36,.2);background:var(--am2)}.s-purple{border-color:rgba(192,132,252,.2);background:var(--p2)}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:17px;margin-bottom:13px}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px}
+.card-title{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;font-family:"JetBrains Mono",monospace}
+.card-action{font-size:11px;color:var(--accent);cursor:pointer;background:none;border:none}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.prog-wrap{margin-bottom:10px}
+.prog-head{display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px}
+.prog-name{color:var(--text2)}.prog-pct{color:var(--muted);font-family:"JetBrains Mono",monospace;font-size:10px}
+.prog-bar{height:4px;background:var(--bg4);border-radius:2px;overflow:hidden}
+.prog-fill{height:100%;border-radius:2px;transition:width .4s}
+.pf-blue{background:var(--accent)}.pf-green{background:var(--green)}.pf-amber{background:var(--amber)}.pf-purple{background:var(--purple)}.pf-teal{background:var(--teal)}
+.check-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);cursor:pointer}
+.check-item:last-child{border-bottom:none}
+.check-box{width:17px;height:17px;border:2px solid var(--dim);border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.check-item.done .check-box{background:var(--green);border-color:var(--green)}
+.check-item.done .check-box::after{content:"checkmark";font-size:9px;color:#000;font-weight:700;content:"¹3"}
+.check-item.done .check-label{text-decoration:line-through;color:var(--muted)}
+.check-label{font-size:13px;flex:1}
+.inp{background:var(--bg3);border:1px solid var(--border2);border-radius:6px;color:var(--text);padding:8px 12px;font-size:13px;width:100%;outline:none;transition:border .15s;font-family:"DM Sans",sans-serif}
+.inp:focus{border-color:var(--accent)}.inp::placeholder{color:var(--muted)}
+textarea.inp{resize:vertical;min-height:70px}select.inp{cursor:pointer}
+.form-lbl{font-size:10px;color:var(--muted);margin-bottom:3px;display:block;font-family:"JetBrains Mono",monospace}
+.form-row{margin-bottom:10px}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;border:none;font-family:"DM Sans",sans-serif;transition:all .15s}
+.btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{background:#2563eb}
+.btn-ghost{background:var(--bg4);color:var(--text);border:1px solid var(--border2)}.btn-ghost:hover{background:var(--bg5)}
+.btn-green{background:var(--g2);color:var(--green);border:1px solid rgba(52,211,153,.2)}
+.btn-red{background:var(--r2);color:var(--red);border:1px solid rgba(248,113,113,.2)}
+.btn-sm{padding:5px 10px;font-size:11px}
+.ppl-badge{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--r);font-size:15px;font-weight:700}
+.ppl-push{background:rgba(239,68,68,.13);color:#ef4444;border:1px solid rgba(239,68,68,.22)}
+.ppl-pull{background:var(--a3);color:var(--accent);border:1px solid rgba(74,158,255,.22)}
+.ppl-legs{background:var(--g2);color:var(--green);border:1px solid rgba(52,211,153,.18)}
+.ppl-rest{background:var(--bg4);color:var(--muted);border:1px solid var(--border2)}
+.ppl-krank{background:var(--r2);color:var(--red);border:1px solid rgba(248,113,113,.25)}
+.habit-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.hc{aspect-ratio:1;border-radius:2px;background:var(--bg4)}.hc.gym{background:var(--accent)}.hc.krank{background:var(--red);opacity:.7}
+.rule-strip{background:var(--bg3);border-left:2px solid var(--accent);padding:8px 12px;font-size:12.5px;color:var(--text2);border-radius:0 5px 5px 0;margin-bottom:5px}
+.krank-banner{background:var(--r2);border:1px solid rgba(248,113,113,.3);border-radius:6px;padding:10px 14px;font-size:12.5px;color:var(--red);margin-bottom:13px;display:flex;align-items:center;gap:8px}
+.money-big{font-size:38px;font-weight:700;font-family:"JetBrains Mono",monospace;color:var(--accent);letter-spacing:-1px}
+.list-item{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+.list-item:last-child{border-bottom:none}
+.list-left{display:flex;align-items:center;gap:8px}
+.tag{display:inline-flex;padding:2px 6px;border-radius:3px;font-size:9px;font-family:"JetBrains Mono",monospace}
+.t-blue{background:var(--a2);color:var(--accent)}.t-green{background:var(--g2);color:var(--green)}
+.t-amber{background:var(--am2);color:var(--amber)}.t-red{background:var(--r2);color:var(--red)}
+.t-purple{background:var(--p2);color:var(--purple)}.t-teal{background:var(--t2);color:var(--teal)}
+.sq-wrap{display:flex;gap:7px;flex-wrap:wrap}
+.sq-btn{padding:6px 12px;border-radius:20px;font-size:11px;border:1px solid var(--border2);background:var(--bg4);color:var(--muted);cursor:pointer;transition:all .15s}
+.sq-bad{background:var(--r2)!important;color:var(--red)!important;border-color:rgba(248,113,113,.3)!important}
+.sq-ok{background:var(--am2)!important;color:var(--amber)!important;border-color:rgba(251,191,36,.3)!important}
+.sq-good{background:var(--g2)!important;color:var(--green)!important;border-color:rgba(52,211,153,.3)!important}
+.j-entry{background:var(--bg3);border-radius:6px;padding:12px;margin-bottom:8px;border-left:2px solid var(--accent)}
+.j-date{font-size:9px;font-family:"JetBrains Mono",monospace;color:var(--muted);margin-bottom:4px}
+.j-text{font-size:13px;line-height:1.6;color:var(--text2)}
+.inv-card{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:13px;margin-bottom:7px}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);padding:20px;width:400px;max-width:92vw;max-height:82vh;overflow-y:auto}
+.modal-title{font-size:14px;font-weight:600;margin-bottom:13px}
+.modal-footer{display:flex;gap:7px;justify-content:flex-end;margin-top:13px}
+/* LERN */
+.lern-wrap{display:flex;height:calc(100vh - 52px);margin:-22px -26px -22px -26px;overflow:hidden}@media(max-width:768px){.lern-wrap{height:auto;margin:0;flex-direction:column;overflow:visible}}
+.lern-nav{width:255px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0}@media(min-width:769px){.lern-nav{overflow:hidden}}
+.lern-filters{padding:8px 10px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:5px;flex-shrink:0}
+.filter-row{display:flex;gap:3px}
+.ftab{flex:1;padding:4px 2px;font-size:9px;font-family:"JetBrains Mono",monospace;border-radius:4px;color:var(--muted);border:1px solid transparent;text-align:center;cursor:pointer;background:none;transition:all .15s}
+.ftab.active{background:var(--a2);color:var(--accent);border-color:rgba(74,158,255,.2)}
+.ftab:hover:not(.active){background:var(--bg3);color:var(--text2)}
+.lern-list{flex:1}@media(min-width:769px){.lern-list{overflow-y:auto}}
+.lg-head{padding:7px 11px 2px;font-size:9px;font-family:"JetBrains Mono",monospace;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;display:flex;align-items:center;gap:5px}
+.lg-cnt{background:var(--bg4);color:var(--muted);border-radius:3px;padding:1px 5px;font-size:9px}
+.lt-btn{display:flex;align-items:center;gap:7px;padding:7px 11px;width:100%;cursor:pointer;border-left:2px solid transparent;transition:all .12s;text-align:left;background:none;border-top:none;border-right:none;border-bottom:none}
+.lt-btn:hover{background:var(--bg3)}.lt-btn.active{background:var(--a3);border-left-color:var(--accent)}
+.lt-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.lt-info{flex:1;min-width:0}
+.lt-name{font-size:12px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3}
+.lt-btn.active .lt-name{color:var(--text)}
+.lt-meta{font-size:9px;color:var(--muted);font-family:"JetBrains Mono",monospace;margin-top:1px}
+.lt-done{font-size:10px;color:var(--green)}
+.lern-area{flex:1;background:var(--bg)}@media(min-width:769px){.lern-area{overflow-y:auto}}
+.lern-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--muted);text-align:center;gap:12px}
+/* LERNSEITE */
+.lernseite{max-width:760px;margin:0 auto;padding:26px 30px 80px}
+.ls-crumb{font-size:10px;font-family:"JetBrains Mono",monospace;color:var(--muted);margin-bottom:14px;display:flex;gap:5px;align-items:center}
+.ls-crumb span{color:var(--accent)}
+.ls-badges{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px}
+.badge{display:inline-flex;padding:2px 7px;border-radius:3px;font-size:9px;font-family:"JetBrains Mono",monospace;font-weight:600}
+.b-blue{background:var(--a2);color:var(--accent);border:1px solid rgba(74,158,255,.2)}
+.b-green{background:var(--g2);color:var(--green);border:1px solid rgba(52,211,153,.2)}
+.b-amber{background:var(--am2);color:var(--amber);border:1px solid rgba(251,191,36,.2)}
+.b-purple{background:var(--p2);color:var(--purple);border:1px solid rgba(192,132,252,.2)}
+.b-orange{background:var(--o2);color:var(--orange);border:1px solid rgba(251,146,60,.2)}
+.ls-title{font-family:"Syne",sans-serif;font-size:24px;font-weight:700;letter-spacing:-.4px;line-height:1.2;margin-bottom:7px}
+.ls-lead{font-size:14px;line-height:1.75;color:var(--text2);max-width:640px;margin-bottom:22px}
+.sec{margin-bottom:22px}
+.sec-label{font-size:9px;font-family:"JetBrains Mono",monospace;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px;padding-bottom:7px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px}
+.ftext{font-size:14px;line-height:1.8;color:var(--text2)}.ftext p{margin-bottom:10px}.ftext p:last-child{margin-bottom:0}.ftext strong{color:var(--text);font-weight:500}
+.formel-grid{display:flex;flex-direction:column;gap:7px}
+.formel-item{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:12px 16px}
+.formel-lbl{font-size:9px;font-family:"JetBrains Mono",monospace;color:var(--muted);margin-bottom:4px}
+.formel-f{font-family:"JetBrains Mono",monospace;font-size:15px;color:var(--accent);font-weight:500}
+.formel-e{font-size:11px;color:var(--text2);margin-top:3px}
+.ader-tbl{width:100%;border-collapse:collapse;font-size:13px}
+.ader-tbl th{background:var(--bg3);padding:8px 12px;text-align:left;font-size:9px;font-family:"JetBrains Mono",monospace;color:var(--muted);letter-spacing:.05em;border-bottom:1px solid var(--border2)}
+.ader-tbl td{padding:8px 12px;border-bottom:1px solid var(--border);color:var(--text2);vertical-align:middle}
+.ader-tbl tr:last-child td{border-bottom:none}.ader-tbl tr:hover td{background:var(--bg3)}
+.a-swatch{display:inline-flex;align-items:center;gap:7px}.a-dot{width:16px;height:16px;border-radius:3px;border:1px solid rgba(255,255,255,.12);flex-shrink:0}
+.merksatz{background:var(--am2);border:1px solid rgba(251,191,36,.18);border-left:3px solid var(--amber);border-radius:0 var(--r) var(--r) 0;padding:12px 16px}
+.merk-head{font-size:9px;font-family:"JetBrains Mono",monospace;color:var(--amber);letter-spacing:.1em;margin-bottom:5px}
+.merk-text{font-size:13.5px;line-height:1.65;color:var(--text)}
+.praxistipp{background:var(--g2);border:1px solid rgba(52,211,153,.15);border-left:3px solid var(--green);border-radius:0 var(--r) var(--r) 0;padding:11px 15px;margin-bottom:7px}
+.praxis-head{font-size:9px;font-family:"JetBrains Mono",monospace;color:var(--green);letter-spacing:.1em;margin-bottom:4px}
+.praxis-text{font-size:13px;line-height:1.6;color:var(--text2)}
+.fehler-box{background:var(--r2);border:1px solid rgba(248,113,113,.15);border-left:3px solid var(--red);border-radius:0 var(--r) var(--r) 0;padding:10px 14px;margin-bottom:6px}
+.fehler-head{font-size:9px;font-family:"JetBrains Mono",monospace;color:var(--red);letter-spacing:.1em;margin-bottom:3px}
+.fehler-text{font-size:13px;line-height:1.6;color:var(--text2)}
+.norm-box{background:var(--p2);border:1px solid rgba(192,132,252,.15);border-radius:var(--r);padding:11px 14px;margin-bottom:6px;display:flex;gap:10px;align-items:flex-start}
+.norm-nr{font-family:"JetBrains Mono",monospace;font-size:10px;font-weight:600;color:var(--purple);background:rgba(192,132,252,.15);padding:3px 7px;border-radius:3px;flex-shrink:0;margin-top:1px}
+.norm-text{font-size:13px;line-height:1.6;color:var(--text2)}
+.aufg-toggle{width:100%;display:flex;align-items:center;justify-content:space-between;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:11px 14px;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;margin-bottom:7px;color:var(--text);text-align:left}
+.aufg-toggle:hover{border-color:var(--border3)}.aufg-toggle.open{border-color:rgba(74,158,255,.3);background:var(--a3);border-radius:var(--r) var(--r) 0 0;margin-bottom:0}
+.aufg-chevron{font-size:13px;color:var(--muted);transition:transform .2s}.aufg-toggle.open .aufg-chevron{transform:rotate(90deg);color:var(--accent)}
+.aufg-body{display:none;background:var(--bg3);border:1px solid rgba(74,158,255,.3);border-top:none;border-radius:0 0 var(--r) var(--r);padding:14px;margin-bottom:7px}
+.aufg-body.open{display:block}
+.aufgabe{background:var(--bg4);border-radius:6px;padding:12px 14px;margin-bottom:8px}.aufgabe:last-child{margin-bottom:0}
+.aufg-nr{font-size:9px;font-family:"JetBrains Mono",monospace;color:var(--accent);margin-bottom:4px}
+.aufg-text{font-size:13px;line-height:1.7;color:var(--text2);margin-bottom:8px}
+.lsg-btn{font-size:10px;font-family:"JetBrains Mono",monospace;color:var(--accent);background:none;border:1px solid rgba(74,158,255,.2);padding:3px 9px;border-radius:3px;cursor:pointer}
+.lsg-box{display:none;margin-top:9px;padding:9px 12px;background:var(--bg5);border-radius:6px;border-left:2px solid var(--green);font-size:12px;color:var(--green);font-family:"JetBrains Mono",monospace;line-height:1.7;white-space:pre-wrap}
+.lsg-box.show{display:block}
+.done-bar{position:sticky;bottom:0;padding:12px 0 6px;background:linear-gradient(transparent,var(--bg) 35%);display:flex;gap:8px;align-items:center}
+.done-btn{display:inline-flex;align-items:center;gap:5px;padding:8px 16px;border-radius:var(--r);font-size:12px;font-weight:500;cursor:pointer;border:none;font-family:"DM Sans",sans-serif;transition:all .15s}
+.done-btn.nd{background:var(--accent);color:#fff}.done-btn.nd:hover{background:#2563eb}
+.done-btn.id{background:var(--g2);color:var(--green);border:1px solid rgba(52,211,153,.25)}
+.next-btn{display:inline-flex;align-items:center;gap:4px;padding:8px 14px;border-radius:var(--r);font-size:12px;background:var(--bg3);border:1px solid var(--border2);color:var(--text2);cursor:pointer;font-family:"DM Sans",sans-serif;transition:all .15s}
+.next-btn:hover{border-color:var(--border3);color:var(--text)}
+.kal-cell{min-height:80px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);padding:5px;cursor:pointer;transition:background .12s;position:relative;vertical-align:top}
+.kal-cell:hover{background:var(--bg3)}
+.kal-cell.today{background:var(--a3)}
+.kal-cell.other-month{opacity:.35}
+.kal-cell.selected{background:var(--a2);outline:1px solid var(--accent)}
+.kal-day-num{font-size:11px;font-family:JetBrains Mono,monospace;color:var(--muted);margin-bottom:3px;font-weight:600}
+.kal-cell.today .kal-day-num{color:var(--accent);font-weight:700}
+.kal-event-dot{display:flex;align-items:center;gap:4px;font-size:10px;line-height:1.3;padding:1px 3px;border-radius:2px;margin-bottom:2px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:100%}
+.kev-gym{background:rgba(52,211,153,.15);color:var(--green)}
+.kev-health{background:rgba(248,113,113,.15);color:var(--red)}
+.kev-business{background:rgba(74,158,255,.15);color:var(--accent)}
+.kev-lernen{background:rgba(251,191,36,.15);color:var(--amber)}
+.kev-persoenlich{background:rgba(192,132,252,.15);color:var(--purple)}
+.kev-reise{background:rgba(45,212,191,.15);color:var(--teal)}
+.kev-sonstiges{background:var(--bg4);color:var(--muted)}
+.upcoming-item{display:flex;align-items:flex-start;gap:9px;padding:8px 0;border-bottom:1px solid var(--border)}
+.upcoming-item:last-child{border-bottom:none}
+.upcoming-date{font-family:JetBrains Mono,monospace;font-size:9px;color:var(--muted);min-width:48px;padding-top:2px}
+.upcoming-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.upcoming-info{flex:1}
+.upcoming-title{font-size:13px;color:var(--text)}
+.upcoming-sub{font-size:10px;color:var(--muted);margin-top:1px}
+.bn-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px 6px;font-size:8px;font-weight:600;color:var(--muted);letter-spacing:.04em;cursor:pointer;font-family:JetBrains Mono,monospace;transition:color .15s;border:none;background:none}
+.bn-btn.active{color:var(--accent)}
+.mehr-btn{display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 6px;border-radius:10px;font-size:9px;font-family:JetBrains Mono,monospace;color:var(--text2);background:var(--bg3);border:1px solid var(--border);cursor:pointer;transition:all .15s;line-height:1.4}
+.mehr-btn:hover,.mehr-btn:active{background:var(--a2);color:var(--accent);border-color:rgba(74,158,255,.3)}
+.bn-btn.active{color:var(--accent)}
+@media(max-width:768px){.sidebar{display:none}#bottom-nav{display:block!important}.stat-row{grid-template-columns:1fr 1fr}.grid-2{grid-template-columns:1fr}.lern-wrap{flex-direction:column;height:auto;margin:0}.lern-nav{width:100%;max-height:240px}.lern-area{min-height:60vh}.lernseite{padding:14px 12px 60px}.content{padding:14px;padding-bottom:75px}.app{height:auto;min-height:100vh}.main{overflow:visible}.content{overflow:visible}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="sb-top">
+    <div class="sb-logo">Lio<span>.</span>OS</div>
+    <div class="sb-sub">life operating system v3</div>
+    <div class="sb-prog">
+      <div class="sb-prog-row"><span>Lernstoff</span><span id="sb-lern-pct">0%</span></div>
+      <div class="sb-prog-bar"><div class="sb-prog-fill" id="sb-lern-bar" style="width:0%"></div></div>
+    </div>
+  </div>
+  <div class="sb-scroll">
+    <div class="sb-section">Main</div>
+    <button class="sb-item active" onclick="nav('dashboard')"><span class="si-icon">⬡</span><span class="si-text">Dashboard</span></button>
+    <button class="sb-item" onclick="nav('daily')"><span class="si-icon">✓</span><span class="si-text">Daily</span></button>
+    <div class="sb-section">Body</div>
+    <button class="sb-item" onclick="nav('gym')"><span class="si-icon">◈</span><span class="si-text">Gym</span></button>
+    <button class="sb-item" onclick="nav('nutrition')"><span class="si-icon">◉</span><span class="si-text">Ernährung</span></button>
+    <button class="sb-item" onclick="nav('skin')"><span class="si-icon">◌</span><span class="si-text">Haut &amp; Looks</span></button>
+    <button class="sb-item" onclick="nav('sleep')"><span class="si-icon">◑</span><span class="si-text">Schlaf</span></button>
+    <div class="sb-section">Mind &amp; Money</div>
+    <button class="sb-item" onclick="nav('goals')"><span class="si-icon">◆</span><span class="si-text">Ziele</span></button>
+    <button class="sb-item" onclick="nav('finance')"><span class="si-icon">◇</span><span class="si-text">Finanzen</span></button>
+    <button class="sb-item" onclick="nav('invest')"><span class="si-icon">▲</span><span class="si-text">Investieren</span></button>
+    <button class="sb-item" onclick="nav('business')"><span class="si-icon">▣</span><span class="si-text">Business</span></button>
+    <div class="sb-section">Lernen</div>
+    <button class="sb-item" onclick="nav('lernstoff')"><span class="si-icon">⚡</span><span class="si-text">Elektro Lernstoff</span></button>
+    <button class="sb-item" onclick="nav('sprachen')"><span class="si-icon">◐</span><span class="si-text">Sprachen</span></button>
+    <div class="sb-section">Leben</div>
+    <button class="sb-item" onclick="nav('reisen')"><span class="si-icon">◒</span><span class="si-text">Reisen</span></button>
+    <button class="sb-item" onclick="nav('kalender')"><span class="si-icon">◫</span><span class="si-text">Kalender</span></button>
+    <button class="sb-item" onclick="nav('journal')"><span class="si-icon">▤</span><span class="si-text">Journal</span></button>
+    <button class="sb-item" onclick="nav('verlauf')"><span class="si-icon">▦</span><span class="si-text">Tages-Verlauf</span></button>
+    <button class="sb-item" onclick="nav('wochenreview')"><span class="si-icon">◭</span><span class="si-text">Wochen-Review</span></button>
+  </div>
+  <div class="sb-footer" id="sb-date">—</div>
+</aside>
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="page-title">Dashboard</div>
+    <div class="topbar-right">
+      <div id="sync-status" style="font-size:9px;font-family:JetBrains Mono,monospace;color:var(--muted);padding:3px 7px;background:var(--bg3);border-radius:3px;border:1px solid var(--border)">&#8635; Sync...</div>
+      <div class="tb-badge tb-amber">&#128293; <span id="tb-streak">0</span></div>
+      <div class="tb-badge tb-blue">Score: <span id="tb-score">—</span></div>
+      <button class="tb-btn" onclick="resetDay()">&#8635; Reset</button>
+    </div>
+  </div>
+  <div class="content" id="main-content">
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div style="margin-bottom:16px">
+        <div style="font-family:Syne,sans-serif;font-size:20px;font-weight:700" id="greeting">Guten Morgen, Lio</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px;font-family:JetBrains Mono,monospace" id="date-label">—</div>
+      </div>
+      <div id="krank-banner" style="display:none"><div class="krank-banner">&#129298; Krank-Tag aktiv — Streak pausiert</div></div>
+      <div style="margin-bottom:14px">
+        <div style="font-size:9px;color:var(--muted);font-family:JetBrains Mono,monospace;margin-bottom:5px;letter-spacing:.06em">NICHT VERHANDELBAR</div>
+        <div class="rule-strip">Gym oder Dehnen — KEINE Ausnahme (ausser krank)</div>
+        <div class="rule-strip">Haut-Routine morgens &amp; abends</div>
+        <div class="rule-strip">Min. 2L Wasser</div>
+        <div class="rule-strip">Kein Zucker, kein processed Food</div>
+      </div>
+      <div class="stat-row">
+        <div class="stat s-accent"><div class="stat-lbl">Vermoegen</div><div class="stat-val" style="font-size:17px;font-family:JetBrains Mono,monospace" id="d-money">1.000&#8364;</div><div class="stat-sub">von 1.000.000&#8364;</div></div>
+        <div class="stat s-amber"><div class="stat-lbl">Gym Streak</div><div class="stat-val" id="d-streak">0</div><div class="stat-sub">Tage</div></div>
+        <div class="stat s-green"><div class="stat-lbl">Gewicht</div><div class="stat-val" style="font-size:16px;font-family:JetBrains Mono,monospace" id="d-weight">75 kg</div><div class="stat-sub">aktuell</div></div>
+        <div class="stat s-purple"><div class="stat-lbl">Tages-Score</div><div class="stat-val" id="d-score">—</div><div class="stat-sub">von 100</div></div>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Training heute</div></div>
+          <div id="d-ppl" style="margin-bottom:12px"></div>
+          <div style="display:flex;gap:7px">
+            <button class="btn btn-green btn-sm" onclick="logGym()">&#10003; Training</button>
+            <button class="btn btn-red btn-sm" onclick="logKrank()">&#129298; Krank</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Makros heute</div><button class="card-action" onclick="nav('nutrition')">&#8594;</button></div>
+          <div class="prog-wrap"><div class="prog-head"><span class="prog-name">Protein</span><span class="prog-pct" id="d-p-pct">0/150g</span></div><div class="prog-bar"><div class="prog-fill pf-blue" id="d-p-bar" style="width:0%"></div></div></div>
+          <div class="prog-wrap"><div class="prog-head"><span class="prog-name">Kalorien</span><span class="prog-pct" id="d-k-pct">0/2600</span></div><div class="prog-bar"><div class="prog-fill pf-amber" id="d-k-bar" style="width:0%"></div></div></div>
+          <div class="prog-wrap"><div class="prog-head"><span class="prog-name">Wasser</span><span class="prog-pct" id="d-w-pct">0/8</span></div><div class="prog-bar"><div class="prog-fill pf-teal" id="d-w-bar" style="width:0%"></div></div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">Langzeit-Ziele</div><button class="card-action" onclick="nav('goals')">Alle &#8594;</button></div>
+        <div class="prog-wrap"><div class="prog-head"><span class="prog-name">&#128176; 1M&#8364; bis 25</span><span class="prog-pct" id="d-m-pct">0.1%</span></div><div class="prog-bar"><div class="prog-fill pf-blue" id="d-m-bar" style="width:0.1%"></div></div></div>
+        <div class="prog-wrap"><div class="prog-head"><span class="prog-name">&#127891; Ausbildung</span><span class="prog-pct">0%</span></div><div class="prog-bar"><div class="prog-fill pf-green" style="width:0%"></div></div></div>
+        <div class="prog-wrap"><div class="prog-head"><span class="prog-name">&#9889; Lernstoff</span><span class="prog-pct" id="d-lern-pct">0%</span></div><div class="prog-bar"><div class="prog-fill pf-purple" id="d-lern-bar" style="width:0%"></div></div></div>
+      </div>
+    </div>
+
+    <!-- DAILY -->
+    <div class="page" id="page-daily">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div><div style="font-size:16px;font-weight:600">Daily Checklist</div><div style="font-size:10px;color:var(--muted);font-family:JetBrains Mono,monospace;margin-top:2px" id="daily-date">—</div></div>
+        <div style="display:flex;gap:6px"><button class="btn btn-ghost btn-sm" onclick="openModal('m-task')">+ Task</button><button class="btn btn-ghost btn-sm" onclick="resetDay()">&#8635;</button></div>
+      </div>
+      <div class="card" style="border-color:rgba(74,158,255,.2);background:var(--a3)">
+      <div class="card-header"><div class="card-title">&#9889; Fokus heute (1 Sache)</div></div>
+      <div style="display:flex;gap:7px">
+        <input class="inp" id="focus-today" placeholder="Was ist die 1 wichtigste Sache heute?" style="flex:1;background:var(--bg4)">
+        <button class="btn btn-primary btn-sm" onclick="saveFocus()">OK</button>
+      </div>
+      <div id="focus-display" style="margin-top:8px;font-size:13px;color:var(--text2);font-style:italic;display:none"></div>
+    </div>
+    <div class="card"><div class="card-header"><div class="card-title">Morgen</div><div style="display:flex;gap:5px"><span class="tag t-teal" id="supp-done-badge" style="display:none">Supps ✓</span></div></div><div id="morning-tasks"></div></div>
+      <div class="card"><div class="card-header"><div class="card-title">Tagsüber</div></div><div id="day-tasks"></div></div>
+      <div class="card"><div class="card-header"><div class="card-title">Abend</div></div><div id="evening-tasks"></div></div>
+    </div>
+
+    <!-- GYM -->
+    <div class="page" id="page-gym">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div style="font-size:16px;font-weight:600">Gym Tracker</div>
+        <div style="display:flex;gap:6px"><button class="btn btn-green btn-sm" onclick="logGym()">&#10003; Training</button><button class="btn btn-red btn-sm" onclick="logKrank()">&#129298; Krank</button></div>
+      </div>
+      <div id="krank-banner-gym" style="display:none"><div class="krank-banner">&#129298; Krank-Tag — Streak pausiert</div></div>
+      <div class="stat-row">
+        <div class="stat s-amber"><div class="stat-lbl">Streak</div><div class="stat-val" id="gym-streak">0</div><div class="stat-sub">Tage</div></div>
+        <div class="stat" style="border-color:rgba(248,113,113,.2);background:var(--r2)"><div class="stat-lbl">Krank-Tage</div><div class="stat-val" id="gym-krank">0</div><div class="stat-sub">dieses Jahr</div></div>
+        <div class="stat s-green"><div class="stat-lbl">Gewicht</div><div class="stat-val" style="font-size:15px;font-family:JetBrains Mono,monospace" id="gym-weight">75 kg</div><div class="stat-sub"><button class="card-action" onclick="updWeight()">update</button></div></div>
+        <div class="stat s-purple"><div class="stat-lbl">KFA</div><div class="stat-val" style="font-size:15px;font-family:JetBrains Mono,monospace" id="gym-kfa">—%</div><div class="stat-sub"><button class="card-action" onclick="updKFA()">update</button></div></div>
+      </div>
+      <div class="grid-2">
+        <div class="card"><div class="card-header"><div class="card-title">Split heute</div></div><div id="gym-ppl"></div><div style="margin-top:10px;font-size:10px;color:var(--muted)">Morgen:</div><div id="gym-ppl-next" style="margin-top:5px"></div></div>
+        <div class="card"><div class="card-header"><div class="card-title">28 Tage</div></div><div class="habit-grid" id="habit-grid"></div><div style="margin-top:7px;display:flex;gap:10px;font-size:9px;font-family:JetBrains Mono,monospace;color:var(--muted)"><span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:9px;border-radius:2px;background:var(--accent);display:inline-block"></span>Training</span><span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:9px;border-radius:2px;background:var(--red);display:inline-block"></span>Krank</span></div></div>
+      </div>
+      <div class="card"><div class="card-header"><div class="card-title">Personal Records</div><button class="card-action" onclick="openModal('m-pr')">+ PR</button></div><div id="pr-list"></div></div>
+    </div>
+
+    <!-- NUTRITION -->
+    <div class="page" id="page-nutrition">
+      <div style="margin-bottom:16px;font-size:16px;font-weight:600">Ernaehrung</div>
+      <div class="stat-row">
+        <div class="stat s-accent"><div class="stat-lbl">Protein</div><div class="stat-val" id="nu-p">0g</div><div class="stat-sub">Ziel: 150g</div></div>
+        <div class="stat s-amber"><div class="stat-lbl">Kalorien</div><div class="stat-val" id="nu-k">0</div><div class="stat-sub">Ziel: 2600</div></div>
+        <div class="stat s-green"><div class="stat-lbl">Carbs</div><div class="stat-val" id="nu-c">0g</div><div class="stat-sub">Ziel: 280g</div></div>
+        <div class="stat s-purple"><div class="stat-lbl">Fett</div><div class="stat-val" id="nu-f">0g</div><div class="stat-sub">Ziel: 80g</div></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">Makros eintragen</div></div>
+        <div class="prog-wrap"><div class="prog-head"><span class="prog-name">Protein</span><span class="prog-pct" id="nu-p-pct">0/150g</span></div><div class="prog-bar"><div class="prog-fill pf-blue" id="nu-p-bar" style="width:0%"></div></div></div>
+        <div class="prog-wrap"><div class="prog-head"><span class="prog-name">Kalorien</span><span class="prog-pct" id="nu-k-pct">0/2600</span></div><div class="prog-bar"><div class="prog-fill pf-amber" id="nu-k-bar" style="width:0%"></div></div></div>
+        <div class="prog-wrap"><div class="prog-head"><span class="prog-name">Carbs</span><span class="prog-pct" id="nu-c-pct">0/280g</span></div><div class="prog-bar"><div class="prog-fill pf-green" id="nu-c-bar" style="width:0%"></div></div></div>
+        <div class="prog-wrap"><div class="prog-head"><span class="prog-name">Fett</span><span class="prog-pct" id="nu-f-pct">0/80g</span></div><div class="prog-bar"><div class="prog-fill pf-purple" id="nu-f-bar" style="width:0%"></div></div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:6px;align-items:end;margin-top:12px">
+          <div><div class="form-lbl">Protein</div><input class="inp" id="add-p" type="number" placeholder="g"></div>
+          <div><div class="form-lbl">Kcal</div><input class="inp" id="add-k" type="number" placeholder="kcal"></div>
+          <div><div class="form-lbl">Carbs</div><input class="inp" id="add-c" type="number" placeholder="g"></div>
+          <div><div class="form-lbl">Fett</div><input class="inp" id="add-f" type="number" placeholder="g"></div>
+          <button class="btn btn-primary" onclick="addMacros()">+</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">Wasser</div></div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><div id="water-dots" style="display:flex;gap:4px;flex-wrap:wrap"></div><button class="btn btn-ghost btn-sm" onclick="addWater()">+ Glas</button></div>
+        <div style="font-size:10px;color:var(--muted);margin-top:6px;font-family:JetBrains Mono,monospace" id="water-lbl">0 / 8 Glaeser</div>
+      </div>
+    </div>
+
+    <!-- SKIN -->
+    <div class="page" id="page-skin">
+      <div style="margin-bottom:16px;font-size:16px;font-weight:600">Haut &amp; Looks</div>
+      <div class="grid-2">
+        <div class="card"><div class="card-header"><div class="card-title">Morgen-Routine</div></div><div id="skin-morning"></div></div>
+        <div class="card"><div class="card-header"><div class="card-title">Abend-Routine</div></div><div id="skin-evening"></div></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">Akne-Verlauf</div>
+          <div style="display:flex;gap:5px">
+            <button class="btn btn-green btn-sm" onclick="logSkin('besser')">Besser</button>
+            <button class="btn btn-ghost btn-sm" onclick="logSkin('gleich')" style="color:var(--amber)">Gleich</button>
+            <button class="btn btn-red btn-sm" onclick="logSkin('schlechter')">Schlechter</button>
+          </div>
+        </div>
+        <div id="skin-log" style="font-size:12px;color:var(--muted)">Noch keine Eintraege.</div>
+      </div>
+    </div>
+
+    <!-- SLEEP -->
+    <div class="page" id="page-sleep">
+      <div style="margin-bottom:16px;font-size:16px;font-weight:600">Schlaf</div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">Letzte Nacht</div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+          <div><div class="form-lbl">Eingeschlafen</div><input class="inp" id="sleep-s" type="time" value="23:00"></div>
+          <div><div class="form-lbl">Aufgewacht</div><input class="inp" id="sleep-e" type="time" value="07:00"></div>
+        </div>
+        <div style="margin-bottom:12px"><div class="form-lbl">Qualitaet</div>
+          <div class="sq-wrap">
+            <button class="sq-btn" id="sq-schlecht" onclick="setSQ('schlecht')">&#128564; Schlecht</button>
+            <button class="sq-btn" id="sq-ok" onclick="setSQ('ok')">&#128528; Ok</button>
+            <button class="sq-btn" id="sq-gut" onclick="setSQ('gut')">&#128522; Gut</button>
+            <button class="sq-btn" id="sq-top" onclick="setSQ('top')">&#128293; Top</button>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="saveSleep()">Speichern</button>
+      </div>
+      <div class="card"><div class="card-header"><div class="card-title">Verlauf</div></div><div id="sleep-log" style="font-size:12px;color:var(--muted)">Noch keine Eintraege.</div></div>
+    </div>
+
+    <!-- GOALS -->
+    <div class="page" id="page-goals">
+      <div style="margin-bottom:16px;font-size:16px;font-weight:600">Ziele &amp; Meilensteine</div>
+      <div class="card"><div class="card-header"><div class="card-title">Timeline 2025–2031</div></div><div id="goals-tl"></div></div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">Progress</div></div>
+        <div class="prog-wrap"><div class="prog-head"><span class="prog-name">&#128176; 1.000.000&#8364;</span><span class="prog-pct" id="g-m-pct">0.1%</span></div><div class="prog-bar"><div class="prog-fill pf-blue" id="g-m-bar" style="width:0.1%"></div></div></div>
+        <div class="prog-wrap"><div class="prog-head"><span class="prog-name">&#127891; Ausbildung 1,0</span><span class="prog-pct">0%</span></div><div class="prog-bar"><div class="prog-fill pf-green" style="width:0%"></div></div></div>
+        <div class="prog-wrap"><div class="prog-head"><span class="prog-name">&#9889; Meister</span><span class="prog-pct">0%</span></div><div class="prog-bar"><div class="prog-fill pf-amber" style="width:0%"></div></div></div>
+        <div class="prog-wrap"><div class="prog-head"><span class="prog-name">&#127970; EPC / Business</span><span class="prog-pct">5%</span></div><div class="prog-bar"><div class="prog-fill pf-purple" style="width:5%"></div></div></div>
+        <div class="prog-wrap"><div class="prog-head"><span class="prog-name">&#128170; Atletischer Koerper</span><span class="prog-pct">30%</span></div><div class="prog-bar"><div class="prog-fill" style="width:30%;background:var(--red)"></div></div></div>
+      </div>
+    </div>
+
+    <!-- FINANCE -->
+    <div class="page" id="page-finance">
+      <div style="margin-bottom:16px;font-size:16px;font-weight:600">Finanzen</div>
+      <div class="card">
+        <div style="text-align:center;padding:14px 0">
+          <div style="font-size:10px;color:var(--muted);font-family:JetBrains Mono,monospace;margin-bottom:5px">GESAMTVERMOEGEN</div>
+          <div class="money-big" id="fin-money">1.000&#8364;</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:3px">von 1.000.000&#8364;</div>
+          <div style="font-size:11px;color:var(--green);font-family:JetBrains Mono,monospace;margin-top:5px" id="fin-pct">0.1% erreicht</div>
+        </div>
+        <div class="prog-bar" style="height:5px"><div class="prog-fill pf-blue" id="fin-bar" style="width:0.1%"></div></div>
+        <div style="display:flex;gap:7px;margin-top:12px">
+          <input class="inp" id="fin-inp" type="number" placeholder="Neuer Stand (&#8364;)" style="flex:1">
+          <button class="btn btn-primary" onclick="updFinance()">Update</button>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="stat s-green" style="border-radius:var(--r);padding:14px"><div class="stat-lbl">Gespart total</div><div class="stat-val" style="font-size:17px;font-family:JetBrains Mono,monospace" id="fin-saved">0&#8364;</div><div class="stat-sub" id="fin-srate">Sparquote: —%</div></div>
+        <div class="stat s-accent" style="border-radius:var(--r);padding:14px"><div class="stat-lbl">Einkommen</div><div class="stat-val" style="font-size:17px;font-family:JetBrains Mono,monospace" id="fin-inc-total">0&#8364;</div><div class="stat-sub">diesen Monat</div></div>
+      </div>
+      <div class="card"><div class="card-header"><div class="card-title">Sparplan</div><button class="card-action" onclick="openModal('m-spar')">+ Einlage</button></div><div id="spar-list" style="font-size:12px;color:var(--muted)">Noch keine Einlagen.</div></div>
+      <div class="grid-2">
+        <div class="card"><div class="card-header"><div class="card-title">Einnahmen</div><button class="card-action" onclick="openModal('m-inc')">+</button></div><div id="inc-list" style="font-size:12px;color:var(--muted)">Keine.</div></div>
+        <div class="card"><div class="card-header"><div class="card-title">Ausgaben</div><button class="card-action" onclick="openModal('m-exp')">+</button></div><div id="exp-list" style="font-size:12px;color:var(--muted)">Keine.</div></div>
+      </div>
+    </div>
+
+    <!-- INVEST -->
+    <div class="page" id="page-invest">
+      <div style="margin-bottom:16px;font-size:16px;font-weight:600">Investitions-Assistent</div>
+      <div class="card" style="border-color:rgba(74,158,255,.25);background:var(--a3)">
+        <div class="card-header"><div class="card-title">AI Empfehlung</div></div>
+        <div style="font-size:13px;line-height:1.75;color:var(--text2)"><strong style="color:var(--accent)">Bei 1.000&#8364; Startkapital und 6 Jahren bis 25:</strong><br><br>
+        <span style="color:var(--green)">&#9658; 60% ETF (MSCI World / VWCE)</span> — 7% p.a., breit diversifiziert<br>
+        <span style="color:var(--teal)">&#9658; 30% Tagesgeld</span> — liquider Notfallpuffer (3 Monatsgehaelter Ziel)<br>
+        <span style="color:var(--amber)">&#9658; 10% Business reinvestieren</span> — dein groesster Hebel<br><br>
+        <span style="color:var(--muted);font-size:11px">700&#8364; Ausbildungsgehalt: 210&#8364;/Monat sparen = 1,5 Jahre fuer erste 5.000&#8364;</span></div>
+      </div>
+      <div class="card"><div class="card-header"><div class="card-title">Portfolio</div><button class="card-action" onclick="openModal('m-inv')">+ Position</button></div>
+        <div class="inv-card"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><div><div style="font-size:13px;font-weight:500">ETF — MSCI World</div><div style="font-size:10px;color:var(--muted)">VWCE</div></div><span class="tag t-blue">ETF</span></div><div style="font-size:20px;font-weight:700;font-family:JetBrains Mono,monospace;color:var(--green)" id="etf-val">0&#8364;</div><div style="display:flex;gap:7px;margin-top:9px"><input class="inp" id="etf-inp" type="number" placeholder="&#8364;" style="flex:1"><button class="btn btn-primary btn-sm" onclick="investETF()">+</button></div></div>
+        <div class="inv-card"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><div><div style="font-size:13px;font-weight:500">Tagesgeld</div><div style="font-size:10px;color:var(--muted)">Notgroschen</div></div><span class="tag t-teal">Tagesgeld</span></div><div style="font-size:20px;font-weight:700;font-family:JetBrains Mono,monospace;color:var(--green)" id="tages-val">0&#8364;</div><div style="display:flex;gap:7px;margin-top:9px"><input class="inp" id="tages-inp" type="number" placeholder="&#8364;" style="flex:1"><button class="btn btn-primary btn-sm" onclick="investTages()">+</button></div></div>
+        <div id="extra-inv"></div>
+      </div>
+      <div class="card"><div class="card-header"><div class="card-title">Gesamt</div></div>
+        <div style="font-size:28px;font-weight:700;font-family:JetBrains Mono,monospace;color:var(--accent)" id="inv-total">0&#8364;</div>
+        <div style="margin-top:12px">
+          <div class="prog-wrap"><div class="prog-head"><span class="prog-name">ETF</span><span class="prog-pct" id="etf-pct">0%</span></div><div class="prog-bar"><div class="prog-fill pf-blue" id="etf-bar" style="width:0%"></div></div></div>
+          <div class="prog-wrap"><div class="prog-head"><span class="prog-name">Tagesgeld</span><span class="prog-pct" id="tages-pct">0%</span></div><div class="prog-bar"><div class="prog-fill pf-teal" id="tages-bar" style="width:0%"></div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BUSINESS -->
+    <div class="page" id="page-business">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div style="font-size:16px;font-weight:600">Business Board</div>
+        <button class="btn btn-primary btn-sm" onclick="openModal('m-idea')">+ Idee</button>
+      </div>
+      <div class="card"><div class="card-header"><div class="card-title">Ideen Pipeline</div></div><div id="biz-list"><div class="list-item"><div class="list-left"><span class="tag t-blue">Idee</span><span>AI-Tool fuer EPC-Unternehmen</span></div></div><div class="list-item"><div class="list-left"><span class="tag t-amber">In Arbeit</span><span>Skalierbare AI-Dienstleistung</span></div></div></div></div>
+      <div class="card"><div class="card-header"><div class="card-title">Umsatz diesen Monat</div></div><div style="font-size:28px;font-weight:700;font-family:JetBrains Mono,monospace;color:var(--green)" id="biz-umsatz">0&#8364;</div><div style="display:flex;gap:7px;margin-top:10px"><input class="inp" id="biz-inp" type="number" placeholder="&#8364;" style="flex:1"><input class="inp" id="biz-desc" placeholder="Quelle" style="flex:2"><button class="btn btn-primary" onclick="addBiz()">+</button></div></div>
+    </div>
+
+    <!-- LERNSTOFF -->
+    <div class="page" id="page-lernstoff">
+      <div class="lern-wrap">
+        <div class="lern-nav">
+          <div style="padding:12px 11px 8px;border-bottom:1px solid var(--border);flex-shrink:0">
+            <div style="font-family:Syne,sans-serif;font-size:13px;font-weight:700">Elektro<span style="color:var(--accent)">.</span>Learn</div>
+            <div style="font-size:9px;color:var(--muted);font-family:JetBrains Mono,monospace;margin-top:1px">Elektroniker EGB 2025+</div>
+            <div style="margin-top:8px"><div style="display:flex;justify-content:space-between;font-size:9px;font-family:JetBrains Mono,monospace;color:var(--muted);margin-bottom:3px"><span>Gesamt</span><span id="lern-ges-pct">0%</span></div><div style="height:2px;background:var(--dim);border-radius:1px;overflow:hidden"><div style="height:100%;background:linear-gradient(90deg,var(--accent),var(--teal));transition:width .5s" id="lern-ges-bar"></div></div></div>
+          </div>
+          <div class="lern-filters">
+            <div class="filter-row">
+              <button class="ftab active" data-typ="all" onclick="setF('all',this)">Alle</button>
+              <button class="ftab" data-typ="bs" onclick="setF('bs',this)">Berufssch.</button>
+              <button class="ftab" data-typ="praxis" onclick="setF('praxis',this)">Praxis</button>
+              <button class="ftab" data-typ="voraus" onclick="setF('voraus',this)">Voraus</button>
+            </div>
+            <div class="filter-row">
+              <button class="ftab active" data-jahr="all" onclick="setY('all',this)">Alle</button>
+              <button class="ftab" data-jahr="0" onclick="setY('0',this)">Vor</button>
+              <button class="ftab" data-jahr="1" onclick="setY('1',this)">1.Lj</button>
+              <button class="ftab" data-jahr="2" onclick="setY('2',this)">2.Lj</button>
+              <button class="ftab" data-jahr="3" onclick="setY('3',this)">3.Lj</button>
+            </div>
+          </div>
+          <div class="lern-list" id="lern-list"></div>
+        </div>
+        <div class="lern-area" id="lern-area">
+          <div class="lern-empty">
+            <div style="font-size:48px;opacity:.2">&#9889;</div>
+            <div style="font-family:Syne,sans-serif;font-size:17px;font-weight:700">Thema waehlen</div>
+            <div style="font-size:12px;max-width:260px;line-height:1.6;color:var(--muted)">Waehle links ein Thema — Fachbuch-Niveau mit Formeln, Normen und Aufgaben.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SPRACHEN -->
+    <div class="page" id="page-sprachen">
+      <div style="margin-bottom:16px;font-size:16px;font-weight:600">Sprachen</div>
+      <div class="stat-row">
+        <div class="stat s-accent"><div class="stat-lbl">&#127479;&#127482; Russisch</div><div class="stat-val" id="ru-str">0</div><div class="stat-sub">Tage Streak</div></div>
+        <div class="stat s-green"><div class="stat-lbl">&#127464;&#127475; Chinesisch</div><div class="stat-val" id="zh-ses">0</div><div class="stat-sub">Sessions</div></div>
+        <div class="stat s-amber"><div class="stat-lbl">Buecher</div><div class="stat-val" id="books">0</div><div class="stat-sub">gelesen</div></div>
+        <div class="stat s-purple"><div class="stat-lbl">Kurse</div><div class="stat-val" id="kurse">0</div><div class="stat-sub">fertig</div></div>
+      </div>
+      <div class="card"><div class="card-header"><div class="card-title">Heute loggen</div></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-ghost" onclick="addRu()">+ &#127479;&#127482; Russisch</button>
+          <button class="btn btn-ghost" onclick="addZh()">+ &#127464;&#127475; Chinesisch</button>
+          <button class="btn btn-ghost" onclick="addBook()">+ &#128218; Buch</button>
+          <button class="btn btn-ghost" onclick="addKurs()">+ &#127891; Kurs</button>
+        </div>
+      </div>
+      <div class="card"><div class="card-header"><div class="card-title">Ausbildungs-Noten</div><button class="card-action" onclick="openModal('m-note')">+ Note</button></div><div id="noten-list" style="font-size:12px;color:var(--muted)">Noch keine Noten.</div></div>
+    </div>
+
+    <!-- REISEN -->
+    <div class="page" id="page-reisen">
+      <div style="margin-bottom:16px;font-size:16px;font-weight:600">Reisen &amp; Erfahrungen</div>
+      <div class="stat-row">
+        <div class="stat s-accent"><div class="stat-lbl">Laender</div><div class="stat-val">8</div><div class="stat-sub">bereist</div></div>
+        <div class="stat s-green"><div class="stat-lbl">Kontinente</div><div class="stat-val">3</div><div class="stat-sub">Asien, Ozeanien, EU</div></div>
+        <div class="stat s-amber"><div class="stat-lbl">Monate Ausland</div><div class="stat-val">12+</div><div class="stat-sub">gesamt</div></div>
+        <div class="stat s-purple"><div class="stat-lbl">Naechstes Ziel</div><div class="stat-val" style="font-size:14px">&#127471;&#127477;</div><div class="stat-sub">Japan 2026</div></div>
+      </div>
+      <div class="card"><div class="card-header"><div class="card-title">Bereiste Laender</div><button class="card-action" onclick="openModal('m-reise')">+ Eintrag</button></div>
+        <div style="display:flex;flex-wrap:wrap;gap:7px;padding:4px 0">
+          <span class="tag t-blue" style="font-size:11px;padding:4px 9px">&#127462;&#127482; Australien 2023</span>
+          <span class="tag t-blue" style="font-size:11px;padding:4px 9px">&#127481;&#127469; Thailand 2024</span>
+          <span class="tag t-blue" style="font-size:11px;padding:4px 9px">&#127483;&#127475; Vietnam 2024</span>
+          <span class="tag t-blue" style="font-size:11px;padding:4px 9px">&#127477;&#127469; Philippinen 2024</span>
+          <span class="tag t-blue" style="font-size:11px;padding:4px 9px">&#127470;&#127465; Indonesien 2024</span>
+          <span class="tag t-blue" style="font-size:11px;padding:4px 9px">&#127464;&#127475; China 2024</span>
+          <span class="tag t-blue" style="font-size:11px;padding:4px 9px">&#127472;&#127479; Suedkorea 2024</span>
+          <span class="tag t-blue" style="font-size:11px;padding:4px 9px">&#127465;&#127466; Deutschland</span>
+          <span class="tag t-green" style="font-size:11px;padding:4px 9px">&#127471;&#127477; Japan (next)</span>
+        </div>
+      </div>
+      <div class="card"><div class="card-header"><div class="card-title">China Experience — Nanjing &amp; Hongze</div></div>
+        <div style="font-size:10px;color:var(--muted);font-family:JetBrains Mono,monospace;margin-bottom:8px">SEP 2024 – HEUTE</div>
+        <div class="grid-2">
+          <div style="background:var(--bg3);border-radius:6px;padding:11px"><div style="font-size:9px;color:var(--accent);font-family:JetBrains Mono,monospace;margin-bottom:5px">SKILLS</div><div style="font-size:11px;color:var(--text2);line-height:1.8">AutoCAD Praxis<br>Drohnen-Fotografie<br>EPC-Prozesse<br>PV-Systemplanung<br>Internationales Business</div></div>
+          <div style="background:var(--bg3);border-radius:6px;padding:11px"><div style="font-size:9px;color:var(--amber);font-family:JetBrains Mono,monospace;margin-bottom:5px">LEKTIONEN</div><div style="font-size:11px;color:var(--text2);line-height:1.8">Guanxi (关系) = alles<br>Geduld in Meetings<br>Hierarchien respektieren<br>Immer Notizen machen</div></div>
+        </div>
+        <div id="reise-extra" style="margin-top:10px"></div>
+      </div>
+    </div>
+
+    <!-- JOURNAL -->
+    <div class="page" id="page-journal">
+      <div style="margin-bottom:16px;font-size:16px;font-weight:600">Abend-Journal</div>
+      <div class="card"><div class="card-header"><div class="card-title">Heutiger Eintrag</div></div>
+        <textarea class="inp" id="j-today" placeholder="Was war heute gut? Was lief schlecht? Was lernst du daraus?" style="min-height:110px"></textarea>
+        <div style="display:flex;justify-content:flex-end;margin-top:9px"><button class="btn btn-primary btn-sm" onclick="saveJournal()">Speichern</button></div>
+      </div>
+      <div id="j-entries"></div>
+    </div>
+
+    <!-- WOCHENREVIEW -->
+    <div class="page" id="page-wochenreview">
+      <div style="margin-bottom:16px;font-size:16px;font-weight:600">Wochen-Review — KW <span id="kw-nr">—</span></div>
+      <div class="card"><div style="display:grid;gap:9px">
+          <div><div class="form-lbl">Was lief gut?</div><textarea class="inp" id="wr-gut" placeholder="Gym-Streak gehalten..."></textarea></div>
+          <div><div class="form-lbl">Was lief nicht gut?</div><textarea class="inp" id="wr-schlecht" placeholder="Zu wenig Schlaf..."></textarea></div>
+          <div><div class="form-lbl">Lektion</div><textarea class="inp" id="wr-lern" placeholder="Naechste Woche frueher ins Bett..."></textarea></div>
+          <div><div class="form-lbl">Ziel naechste Woche</div><input class="inp" id="wr-ziel" placeholder="z.B. Jeden Tag 2L Wasser"></div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;margin-top:12px"><button class="btn btn-primary" onclick="saveWR()">Speichern</button></div>
+      </div>
+      <div id="wr-list"></div>
+    </div>
+
+    <!-- VERLAUF -->
+    <div class="page" id="page-verlauf">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div>
+          <div style="font-size:16px;font-weight:600">Tages-Verlauf</div>
+          <div style="font-size:10px;color:var(--muted);font-family:JetBrains Mono,monospace;margin-top:2px">Alle Tage gespeichert</div>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="saveTodayManual()">&#128190; Heute speichern</button>
+      </div>
+      <!-- Stats Übersicht -->
+      <div class="stat-row" style="grid-template-columns:repeat(3,1fr)">
+        <div class="stat s-green"><div class="stat-lbl">Tage gespeichert</div><div class="stat-val" id="vl-total">0</div><div class="stat-sub">Gesamt</div></div>
+        <div class="stat s-accent"><div class="stat-lbl">Ø Protein</div><div class="stat-val" id="vl-avg-p">0g</div><div class="stat-sub">pro Tag</div></div>
+        <div class="stat s-amber"><div class="stat-lbl">Ø Score</div><div class="stat-val" id="vl-avg-s">0</div><div class="stat-sub">pro Tag</div></div>
+      </div>
+      <!-- Filter -->
+      <div style="display:flex;gap:6px;margin-bottom:13px;flex-wrap:wrap">
+        <button class="ftab active" onclick="setVlFilter(7,this)">7 Tage</button>
+        <button class="ftab" onclick="setVlFilter(30,this)">30 Tage</button>
+        <button class="ftab" onclick="setVlFilter(90,this)">90 Tage</button>
+        <button class="ftab" onclick="setVlFilter(0,this)">Alle</button>
+      </div>
+      <!-- Verlauf Liste -->
+      <div id="verlauf-list"></div>
+    </div>
+
+    <!-- KALENDER -->
+    <div class="page" id="page-kalender">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div>
+          <div style="font-size:16px;font-weight:600">Kalender</div>
+          <div style="font-size:10px;color:var(--muted);font-family:JetBrains Mono,monospace;margin-top:2px" id="kal-month-lbl">—</div>
+        </div>
+        <div style="display:flex;gap:7px;align-items:center">
+          <button class="tb-btn" onclick="kalPrev()">&#8592;</button>
+          <button class="tb-btn" onclick="kalToday()">Heute</button>
+          <button class="tb-btn" onclick="kalNext()">&#8594;</button>
+          <button class="btn btn-primary btn-sm" onclick="openModal('m-kalevent')">+ Event</button>
+        </div>
+      </div>
+      <!-- Kalender Grid -->
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);border-bottom:1px solid var(--border)">
+          <div style="padding:8px 0;text-align:center;font-size:9px;font-family:JetBrains Mono,monospace;color:var(--muted);letter-spacing:.05em">MO</div>
+          <div style="padding:8px 0;text-align:center;font-size:9px;font-family:JetBrains Mono,monospace;color:var(--muted);letter-spacing:.05em">DI</div>
+          <div style="padding:8px 0;text-align:center;font-size:9px;font-family:JetBrains Mono,monospace;color:var(--muted);letter-spacing:.05em">MI</div>
+          <div style="padding:8px 0;text-align:center;font-size:9px;font-family:JetBrains Mono,monospace;color:var(--muted);letter-spacing:.05em">DO</div>
+          <div style="padding:8px 0;text-align:center;font-size:9px;font-family:JetBrains Mono,monospace;color:var(--muted);letter-spacing:.05em">FR</div>
+          <div style="padding:8px 0;text-align:center;font-size:9px;font-family:JetBrains Mono,monospace;color:var(--muted);letter-spacing:.05em;color:var(--amber)">SA</div>
+          <div style="padding:8px 0;text-align:center;font-size:9px;font-family:JetBrains Mono,monospace;color:var(--red);letter-spacing:.05em">SO</div>
+        </div>
+        <div id="kal-grid" style="display:grid;grid-template-columns:repeat(7,1fr)"></div>
+      </div>
+      <!-- Tages-Detail -->
+      <div id="kal-detail" style="display:none">
+        <div class="card" style="margin-top:0">
+          <div class="card-header">
+            <div class="card-title" id="kal-detail-date">—</div>
+            <button class="card-action" onclick="document.getElementById('kal-detail').style.display='none'">&#10005;</button>
+          </div>
+          <div id="kal-detail-events" style="font-size:13px;color:var(--muted)">Keine Events.</div>
+          <div style="margin-top:10px">
+            <button class="btn btn-ghost btn-sm" onclick="kalAddFromDetail()">+ Event an diesem Tag</button>
+          </div>
+        </div>
+      </div>
+      <!-- Upcoming -->
+      <div class="card" style="margin-top:13px">
+        <div class="card-header"><div class="card-title">Naechste Events</div></div>
+        <div id="kal-upcoming"></div>
+      </div>
+    </div>
+
+  </div>
+
+  </div>
+</div>
+</div>
+
+<!-- BOTTOM NAV (mobile) -->
+<div id="mehr-menu" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.6)" onclick="closeMehr()">
+  <div onclick="event.stopPropagation()" style="position:absolute;bottom:70px;left:0;right:0;background:var(--bg2);border-top:1px solid var(--border2);border-radius:16px 16px 0 0;padding:16px 12px 8px">
+    <div style="font-size:9px;font-family:JetBrains Mono,monospace;color:var(--muted);letter-spacing:.1em;margin-bottom:10px;padding:0 4px">ALLE SEITEN</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+      <button onclick="navMehr('dashboard')" class="mehr-btn">⬡<br>Home</button>
+      <button onclick="navMehr('daily')" class="mehr-btn">✓<br>Daily</button>
+      <button onclick="navMehr('gym')" class="mehr-btn">◈<br>Gym</button>
+      <button onclick="navMehr('nutrition')" class="mehr-btn">◉<br>Ernährung</button>
+      <button onclick="navMehr('skin')" class="mehr-btn">◌<br>Haut</button>
+      <button onclick="navMehr('sleep')" class="mehr-btn">◑<br>Schlaf</button>
+      <button onclick="navMehr('goals')" class="mehr-btn">◆<br>Ziele</button>
+      <button onclick="navMehr('finance')" class="mehr-btn">◇<br>Finanzen</button>
+      <button onclick="navMehr('invest')" class="mehr-btn">▲<br>Invest</button>
+      <button onclick="navMehr('business')" class="mehr-btn">▣<br>Business</button>
+      <button onclick="navMehr('lernstoff')" class="mehr-btn">⚡<br>Lernen</button>
+      <button onclick="navMehr('sprachen')" class="mehr-btn">◐<br>Sprachen</button>
+      <button onclick="navMehr('kalender')" class="mehr-btn">◫<br>Kalender</button>
+      <button onclick="navMehr('reisen')" class="mehr-btn">◒<br>Reisen</button>
+      <button onclick="navMehr('journal')" class="mehr-btn">▤<br>Journal</button>
+      <button onclick="navMehr('wochenreview')" class="mehr-btn">◭<br>Review</button>
+      <button onclick="navMehr('verlauf')" class="mehr-btn">▦<br>Verlauf</button>
+    </div>
+  </div>
+</div>
+<nav style="display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(4,8,15,.97);backdrop-filter:blur(20px);border-top:1px solid var(--border);z-index:100;padding-bottom:env(safe-area-inset-bottom,0)" id="bottom-nav">
+  <div style="display:flex">
+    <button onclick="nav('dashboard')" class="bn-btn" id="bn-dashboard"><div style="font-size:18px">⬡</div><div>Home</div></button>
+    <button onclick="nav('daily')" class="bn-btn" id="bn-daily"><div style="font-size:18px">✓</div><div>Daily</div></button>
+    <button onclick="nav('gym')" class="bn-btn" id="bn-gym"><div style="font-size:18px">◈</div><div>Gym</div></button>
+    <button onclick="nav('lernstoff')" class="bn-btn" id="bn-lernstoff"><div style="font-size:18px">⚡</div><div>Lernen</div></button>
+    <button onclick="nav('kalender')" class="bn-btn" id="bn-kalender"><div style="font-size:18px">◫</div><div>Kalender</div></button>
+    <button onclick="openMehr()" class="bn-btn" id="bn-mehr"><div style="font-size:18px">⋯</div><div>Mehr</div></button>
+  </div>
+</nav>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="m-task"><div class="modal"><div class="modal-title">Task</div><div class="form-row"><label class="form-lbl">Task</label><input class="inp" id="mt-name" placeholder="Was?"></div><div class="form-row"><label class="form-lbl">Wann</label><select class="inp" id="mt-cat"><option value="morning">Morgen</option><option value="day">Tagsüber</option><option value="evening">Abend</option></select></div><div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('m-task')">Abbrechen</button><button class="btn btn-primary" onclick="saveTask()">OK</button></div></div></div>
+<div class="modal-overlay" id="m-pr"><div class="modal"><div class="modal-title">PR</div><div class="form-row"><label class="form-lbl">Uebung</label><input class="inp" id="pr-ex" placeholder="Bankdruecken"></div><div class="form-row"><label class="form-lbl">Gewicht (kg)</label><input class="inp" id="pr-kg" type="number"></div><div class="form-row"><label class="form-lbl">Wdh</label><input class="inp" id="pr-rep" type="number"></div><div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('m-pr')">Abbrechen</button><button class="btn btn-primary" onclick="savePR()">OK</button></div></div></div>
+<div class="modal-overlay" id="m-inc"><div class="modal"><div class="modal-title">Einnahme</div><div class="form-row"><label class="form-lbl">Betrag (&#8364;)</label><input class="inp" id="inc-amt" type="number"></div><div class="form-row"><label class="form-lbl">Quelle</label><input class="inp" id="inc-src" placeholder="Gehalt..."></div><div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('m-inc')">Abbrechen</button><button class="btn btn-primary" onclick="saveInc()">OK</button></div></div></div>
+<div class="modal-overlay" id="m-exp"><div class="modal"><div class="modal-title">Ausgabe</div><div class="form-row"><label class="form-lbl">Betrag (&#8364;)</label><input class="inp" id="exp-amt" type="number"></div><div class="form-row"><label class="form-lbl">Kategorie</label><input class="inp" id="exp-cat" placeholder="Gym..."></div><div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('m-exp')">Abbrechen</button><button class="btn btn-primary" onclick="saveExp()">OK</button></div></div></div>
+<div class="modal-overlay" id="m-spar"><div class="modal"><div class="modal-title">Spareinlage</div><div class="form-row"><label class="form-lbl">Betrag (&#8364;)</label><input class="inp" id="spar-amt" type="number"></div><div class="form-row"><label class="form-lbl">Quelle</label><input class="inp" id="spar-src" placeholder="Gehalt..."></div><div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('m-spar')">Abbrechen</button><button class="btn btn-primary" onclick="saveSpar()">OK</button></div></div></div>
+<div class="modal-overlay" id="m-inv"><div class="modal"><div class="modal-title">Investition</div><div class="form-row"><label class="form-lbl">Name</label><input class="inp" id="inv-name" placeholder="Apple..."></div><div class="form-row"><label class="form-lbl">Typ</label><select class="inp" id="inv-typ"><option>ETF</option><option>Aktie</option><option>Sonstiges</option></select></div><div class="form-row"><label class="form-lbl">Betrag (&#8364;)</label><input class="inp" id="inv-amt" type="number"></div><div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('m-inv')">Abbrechen</button><button class="btn btn-primary" onclick="saveInv()">OK</button></div></div></div>
+<div class="modal-overlay" id="m-idea"><div class="modal"><div class="modal-title">Business-Idee</div><div class="form-row"><label class="form-lbl">Idee</label><input class="inp" id="idea-t" placeholder="Was?"></div><div class="form-row"><label class="form-lbl">Status</label><select class="inp" id="idea-s"><option>Idee</option><option>In Arbeit</option><option>Aktiv</option><option>Pausiert</option></select></div><div class="form-row"><label class="form-lbl">Notiz</label><textarea class="inp" id="idea-n"></textarea></div><div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('m-idea')">Abbrechen</button><button class="btn btn-primary" onclick="saveIdea()">OK</button></div></div></div>
+<div class="modal-overlay" id="m-note"><div class="modal"><div class="modal-title">Note</div><div class="form-row"><label class="form-lbl">Fach</label><input class="inp" id="note-f" placeholder="Elektrotechnik..."></div><div class="form-row"><label class="form-lbl">Note</label><input class="inp" id="note-g" placeholder="1,5"></div><div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('m-note')">Abbrechen</button><button class="btn btn-primary" onclick="saveNote()">OK</button></div></div></div>
+<div class="modal-overlay" id="m-kalevent"><div class="modal"><div class="modal-title">Event / Termin</div>
+<div class="form-row"><label class="form-lbl">Datum</label><input class="inp" id="kev-date" type="date"></div>
+<div class="form-row"><label class="form-lbl">Uhrzeit (optional)</label><input class="inp" id="kev-time" type="time"></div>
+<div class="form-row"><label class="form-lbl">Titel</label><input class="inp" id="kev-title" placeholder="Training, Meeting, Arzt..."></div>
+<div class="form-row"><label class="form-lbl">Kategorie</label><select class="inp" id="kev-cat">
+  <option value="gym">&#128170; Gym</option>
+  <option value="health">&#129658; Gesundheit</option>
+  <option value="business">&#9660; Business</option>
+  <option value="lernen">&#9889; Lernen</option>
+  <option value="persoenlich">&#9734; Persoenlich</option>
+  <option value="reise">&#9992; Reise</option>
+  <option value="sonstiges">&#9632; Sonstiges</option>
+</select></div>
+<div class="form-row"><label class="form-lbl">Notiz</label><textarea class="inp" id="kev-note" placeholder="Details..." style="min-height:55px"></textarea></div>
+<div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('m-kalevent')">Abbrechen</button><button class="btn btn-primary" onclick="saveKalEvent()">Speichern</button></div>
+</div></div>
+<div class="modal-overlay" id="m-reise"><div class="modal"><div class="modal-title">Reise-Eintrag</div><div class="form-row"><label class="form-lbl">Ort &amp; Zeit</label><input class="inp" id="r-ort" placeholder="2025 — Japan"></div><div class="form-row"><label class="form-lbl">Erfahrung</label><textarea class="inp" id="r-text"></textarea></div><div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('m-reise')">Abbrechen</button><button class="btn btn-primary" onclick="saveReise()">OK</button></div></div></div>
+
+<script>
+// ── SUPABASE CONFIG ──
+const SUPA_URL = "https://egzazdgdjconqbzcletr.supabase.co";
+const SUPA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVnemF6ZGdkamNvbnFiemNsZXRyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNjIyMzEsImV4cCI6MjA5MzczODIzMX0.PiTPMvEIMZTYZt034sIvsrbcXnecrp2XNO320Hk6BoE";
+
+// ── LOCAL CACHE (instant UI) + SUPABASE SYNC ──
+const S = {
+  get: (k, d=null) => {
+    try {
+      const v = localStorage.getItem('lio3_'+k);
+      return v ? JSON.parse(v) : d;
+    } catch { return d; }
+  },
+  set: (k, v) => {
+    try {
+      localStorage.setItem('lio3_'+k, JSON.stringify(v));
+      syncToSupabase();
+    } catch {}
+  }
+};
+
+// ── SUPABASE SYNC ──
+var syncTimer = null;
+var isSyncing = false;
+
+function syncToSupabase() {
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(doSync, 1500);
+}
+
+function doSync() {
+  if (isSyncing) return;
+  isSyncing = true;
+  var allData = {};
+  for (var i = 0; i < localStorage.length; i++) {
+    var key = localStorage.key(i);
+    if (key && key.startsWith('lio3_')) {
+      try { allData[key] = JSON.parse(localStorage.getItem(key)); }
+      catch { allData[key] = localStorage.getItem(key); }
+    }
+  }
+  fetch(SUPA_URL + '/rest/v1/lio_data?id=eq.lio_maier', {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': SUPA_KEY,
+      'Authorization': 'Bearer ' + SUPA_KEY,
+      'Prefer': 'return=minimal'
+    },
+    body: JSON.stringify({ data: allData, updated_at: new Date().toISOString() })
+  }).then(function(r) {
+    isSyncing = false;
+    showSyncStatus(r.ok ? 'synced' : 'error');
+  }).catch(function() {
+    isSyncing = false;
+    showSyncStatus('error');
+  });
+}
+
+function loadFromSupabase(callback) {
+  showSyncStatus('loading');
+  fetch(SUPA_URL + '/rest/v1/lio_data?id=eq.lio_maier&select=data,updated_at', {
+    headers: {
+      'apikey': SUPA_KEY,
+      'Authorization': 'Bearer ' + SUPA_KEY
+    }
+  }).then(function(r) { return r.json(); })
+  .then(function(rows) {
+    if (rows && rows.length > 0 && rows[0].data) {
+      var remoteData = rows[0].data;
+      var remoteTime = new Date(rows[0].updated_at || 0).getTime();
+      var localTime = parseInt(localStorage.getItem('lio3_lastSync') || '0');
+      if (remoteTime > localTime) {
+        Object.keys(remoteData).forEach(function(key) {
+          localStorage.setItem(key, JSON.stringify(remoteData[key]));
+        });
+        localStorage.setItem('lio3_lastSync', remoteTime.toString());
+        showSyncStatus('synced');
+      } else {
+        showSyncStatus('synced');
+      }
+    } else {
+      showSyncStatus('synced');
+    }
+    if (callback) callback();
+  }).catch(function() {
+    showSyncStatus('offline');
+    if (callback) callback();
+  });
+}
+
+function showSyncStatus(status) {
+  var el = document.getElementById('sync-status');
+  if (!el) return;
+  var map = {
+    loading: ['&#8635; Sync...', 'var(--muted)'],
+    synced:  ['&#10003; Sync', 'var(--green)'],
+    error:   ['&#9888; Sync Fehler', 'var(--red)'],
+    offline: ['&#9940; Offline', 'var(--amber)']
+  };
+  var info = map[status] || map.synced;
+  el.innerHTML = info[0];
+  el.style.color = info[1];
+}
+
+const today=new Date().toDateString();
+let state={
+  streak:S.get('streak',0),kranktage:S.get('kranktage',0),
+  lastGym:S.get('lastGym',''),gymDays:S.get('gymDays',[]),kranDays:S.get('kranDays',[]),
+  isKrank:S.get('isKrank_'+today,false),
+  weight:S.get('weight',75),kfa:S.get('kfa',''),
+  money:S.get('money',1000),etf:S.get('etf',0),tages:S.get('tages',0),
+  extraInv:S.get('extraInv',[]),saved:S.get('saved',0),
+  incomes:S.get('incomes',[]),expenses:S.get('expenses',[]),sparplan:S.get('sparplan',[]),
+  protein:S.get('p_'+today,0),kcal:S.get('k_'+today,0),
+  carbs:S.get('c_'+today,0),fat:S.get('f_'+today,0),water:S.get('w_'+today,0),
+  sleepQ:S.get('sq_'+today,''),sleepLog:S.get('sleepLog',[]),
+  tasks:S.get('tasks',[
+    {id:1,label:'Aufwachen kein Phone 30min',cat:'morning',done:false},
+    {id:2,label:'Gesicht reinigen (Cleanser)',cat:'morning',done:false},
+    {id:3,label:'Supplements nehmen',cat:'morning',done:false},
+    {id:4,label:'Protein-reiches Fruehstueck',cat:'morning',done:false},
+    {id:5,label:'Sonnencreme SPF 50+',cat:'morning',done:false},
+    {id:6,label:'Gym / Training',cat:'day',done:false},
+    {id:7,label:'2L Wasser getrunken',cat:'day',done:false},
+    {id:8,label:'Duolingo Russisch',cat:'day',done:false},
+    {id:9,label:'Abend-Reinigung Gesicht',cat:'evening',done:false},
+    {id:10,label:'Abend-Hautpflege',cat:'evening',done:false},
+    {id:11,label:'Journal schreiben',cat:'evening',done:false},
+    {id:12,label:'Handy weg 30min vor Schlaf',cat:'evening',done:false},
+  ]),
+  prs:S.get('prs',[]),ideas:S.get('ideas',[]),noten:S.get('noten',[]),
+  skinLog:S.get('skinLog',[]),journals:S.get('journals',[]),weekReviews:S.get('wr',[]),
+  reiseLog:S.get('reiseLog',[]),
+  ruStreak:S.get('ruStreak',0),zhSessions:S.get('zhSessions',0),
+  books:S.get('books',0),courses:S.get('courses',0),
+  bizUmsatz:S.get('bizUmsatz',0),
+  lernDone:S.get('lernDone',{}),
+  lastDay:S.get('lastDay',''),
+};
+if(state.lastDay!==today){
+  state.tasks=state.tasks.map(function(t){return Object.assign({},t,{done:false});});
+  state.isKrank=false;
+  S.set('tasks',state.tasks);S.set('lastDay',today);
+}
+function nav(page){
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');p.style.display='none';});
+  document.querySelectorAll('.sb-item,.bn-btn').forEach(function(b){b.classList.remove('active');});
+  var pg=document.getElementById('page-'+page);
+  if(!pg)return;
+  pg.classList.add('active');
+  pg.style.display='block';
+  document.querySelectorAll('[onclick="nav(\''+page+'\')"]').forEach(function(el){el.classList.add('active');});
+  var titles={dashboard:'Dashboard',daily:'Daily',gym:'Gym',nutrition:'Ernaehrung',skin:'Haut',sleep:'Schlaf',goals:'Ziele',finance:'Finanzen',invest:'Investieren',business:'Business',lernstoff:'Elektro Lernstoff',sprachen:'Sprachen',reisen:'Reisen',journal:'Journal',wochenreview:'Wochen-Review',kalender:'Kalender',verlauf:'Tages-Verlauf'};
+  document.getElementById('page-title').textContent=titles[page]||page;
+  renderPage(page);
+}
+function fmtDate(d){var ds=['So','Mo','Di','Mi','Do','Fr','Sa'],ms=['Jan','Feb','Mar','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];return ds[d.getDay()]+', '+d.getDate()+'. '+ms[d.getMonth()]+' '+d.getFullYear();}
+function greeting(){var h=new Date().getHours();return h<12?'Guten Morgen':h<18?'Guten Tag':'Guten Abend';}
+function getKW(){var d=new Date(),j4=new Date(d.getFullYear(),0,4);return Math.ceil(((d-j4)/86400000+j4.getDay()+1)/7);}
+function ppl(){var c=['Push','Pull','Legs','Rest','Push','Pull','Legs','Rest'],s=new Date('2025-05-06'),diff=Math.floor((new Date()-s)/86400000);return c[((diff%8)+8)%8];}
+function pplNext(){var c=['Push','Pull','Legs','Rest','Push','Pull','Legs','Rest'],s=new Date('2025-05-06'),diff=Math.floor((new Date()-s)/86400000)+1;return c[((diff%8)+8)%8];}
+function pplBadge(day){var cls={Push:'ppl-push',Pull:'ppl-pull',Legs:'ppl-legs',Rest:'ppl-rest',Krank:'ppl-krank'};var em={Push:'<b style="color:#ef4444">&#9632;</b>',Pull:'<b style="color:var(--accent)">&#9632;</b>',Legs:'<b style="color:var(--green)">&#9632;</b>',Rest:'<b style="color:var(--muted)">&#9632;</b>',Krank:'&#129298;'};return '<div class="ppl-badge '+(cls[day]||'ppl-rest')+'">'+(em[day]||'')+' '+day+'</div>';}
+function calcScore(){var s=0,d=state.tasks.filter(function(t){return t.done;}).length;s+=Math.round(d/state.tasks.length*30);if(state.gymDays.indexOf(today)>-1||state.isKrank)s+=20;s+=Math.round(Math.min(100,state.protein/150*100)*0.2);if(state.water>=8)s+=15;else s+=Math.round(state.water/8*15);if(state.sleepQ==='top')s+=15;else if(state.sleepQ==='gut')s+=10;else if(state.sleepQ==='ok')s+=5;return Math.min(100,s);}
+function updateLernProg(){var total=THEMEN.length,done=THEMEN.filter(function(t){return state.lernDone[t.id];}).length,pct=Math.round(done/total*100);['sb-lern-pct','lern-ges-pct','d-lern-pct'].forEach(function(id){var e=document.getElementById(id);if(e)e.textContent=pct+'%';});['sb-lern-bar','lern-ges-bar','d-lern-bar'].forEach(function(id){var e=document.getElementById(id);if(e)e.style.width=pct+'%';});}
+function setEl(id,v){var e=document.getElementById(id);if(e)e.textContent=v;}
+function setStyle(id,prop,val){var e=document.getElementById(id);if(e)e.style[prop]=val;}
+function renderPage(p){
+  if(p==='dashboard')renderDash();
+  else if(p==='daily'){renderTasks();setTimeout(loadFocus,50);}
+  else if(p==='gym')renderGym();
+  else if(p==='nutrition')renderNu();
+  else if(p==='skin')renderSkin();
+  else if(p==='sleep')renderSleep();
+  else if(p==='goals')renderGoals();
+  else if(p==='finance')renderFinance();
+  else if(p==='invest')renderInvest();
+  else if(p==='business')renderBiz();
+  else if(p==='lernstoff')renderLernList();
+  else if(p==='sprachen')renderSprachen();
+  else if(p==='reisen')renderReisen();
+  else if(p==='journal')renderJournal();
+  else if(p==='wochenreview')renderWR();
+  else if(p==='kalender')renderKal();
+  else if(p==='verlauf')renderVerlauf();
+}
+function renderDash(){
+  var d=new Date();
+  setEl('greeting',greeting()+', Lio');
+  var ds=fmtDate(d);
+  setEl('date-label',ds);setEl('sb-date',ds);setEl('daily-date',ds);setEl('kw-nr',getKW());
+  setEl('tb-streak',state.streak);
+  var score=calcScore();
+  var scoreEl=document.getElementById('tb-score');if(scoreEl)scoreEl.textContent=score;
+  var dscEl=document.getElementById('d-score');
+  if(dscEl){dscEl.textContent=score;dscEl.style.color=score>=80?'var(--green)':score>=60?'var(--amber)':'var(--red)';}setEl('d-streak',state.streak);
+  setEl('d-weight',state.weight+' kg');
+  setEl('d-money',state.money.toLocaleString('de')+'€');
+  var kb=document.getElementById('krank-banner');if(kb)kb.style.display=state.isKrank?'block':'none';
+  var pplDay=state.isKrank?'Krank':ppl();
+  var dp=document.getElementById('d-ppl');if(dp)dp.innerHTML=pplBadge(pplDay);
+  var mp=(state.money/1000000*100);
+  setEl('d-m-pct',mp.toFixed(2)+'%');setStyle('d-m-bar','width',mp+'%');
+  updateMacroUI();updateLernProg();
+}
+function renderTasks(){
+  ['morning','day','evening'].forEach(function(cat){
+    var id=cat==='morning'?'morning-tasks':cat==='day'?'day-tasks':'evening-tasks';
+    var el=document.getElementById(id);if(!el)return;
+    el.innerHTML=state.tasks.filter(function(t){return t.cat===cat;}).map(function(t){
+      return '<div class="check-item'+(t.done?' done':'')+'" onclick="toggleTask('+t.id+')"><div class="check-box"></div><span class="check-label">'+t.label+'</span></div>';
+    }).join('');
+  });
+}
+function renderGym(){
+  setEl('gym-streak',state.streak);setEl('gym-krank',state.kranktage);
+  setEl('gym-weight',state.weight+' kg');setEl('gym-kfa',state.kfa?(state.kfa+'%'):'—%');
+  var kb=document.getElementById('krank-banner-gym');if(kb)kb.style.display=state.isKrank?'block':'none';
+  var pplDay=state.isKrank?'Krank':ppl();
+  var gp=document.getElementById('gym-ppl');if(gp)gp.innerHTML=pplBadge(pplDay);
+  var gpn=document.getElementById('gym-ppl-next');if(gpn)gpn.innerHTML='<span style="font-size:10px;color:var(--muted)">Morgen: </span>'+pplBadge(pplNext());
+  var grid=document.getElementById('habit-grid');if(!grid)return;
+  grid.innerHTML='';
+  for(var i=27;i>=0;i--){var d2=new Date();d2.setDate(d2.getDate()-i);var ds=d2.toDateString();var isG=state.gymDays.indexOf(ds)>-1,isK=state.kranDays.indexOf(ds)>-1;var c=document.createElement('div');c.className='hc'+(isG?' gym':isK?' krank':'');grid.appendChild(c);}
+  var prl=document.getElementById('pr-list');
+  if(prl)prl.innerHTML=state.prs.length?state.prs.map(function(pr){return '<div class="list-item"><div class="list-left"><span class="tag t-blue">'+pr.ex+'</span></div><div style="font-family:JetBrains Mono,monospace;font-size:11px;color:var(--text2)">'+pr.kg+'kg x '+pr.rep+'Wdh</div></div>';}).join(''):'<div style="font-size:12px;color:var(--muted)">Noch keine PRs.</div>';
+}
+function updateMacroUI(){
+  var sets=[['p',state.protein,150,'d-p-pct','d-p-bar','nu-p-pct','nu-p-bar','g'],['k',state.kcal,2600,'d-k-pct','d-k-bar','nu-k-pct','nu-k-bar',''],['c',state.carbs,280,null,null,'nu-c-pct','nu-c-bar','g'],['f',state.fat,80,null,null,'nu-f-pct','nu-f-bar','g'],['water',state.water,8,'d-w-pct','d-w-bar',null,null,'']];
+  sets.forEach(function(s){var val=s[1],max=s[2],pct=Math.min(100,Math.round(val/max*100)),lbl=val+'/'+max+s[7];if(s[3]){setEl(s[3],lbl);}if(s[4]){setStyle(s[4],'width',pct+'%');}if(s[5]){setEl(s[5],lbl);}if(s[6]){setStyle(s[6],'width',pct+'%');}});
+}
+function renderNu(){
+  setEl('nu-p',state.protein+'g');setEl('nu-k',state.kcal);setEl('nu-c',state.carbs+'g');setEl('nu-f',state.fat+'g');
+  updateMacroUI();
+  var wd=document.getElementById('water-dots');if(!wd)return;
+  wd.innerHTML='';
+  for(var i=0;i<8;i++){
+    var g=document.createElement('div');
+    g.style.cssText='width:22px;height:22px;border-radius:50%;border:2px solid '+(i<state.water?'var(--accent)':'var(--dim)')+';background:'+(i<state.water?'var(--a2)':'transparent')+';cursor:pointer;display:inline-block;margin:2px;transition:all .15s';
+    (function(idx){g.onclick=function(){state.water=idx+1;S.set('w_'+today,state.water);renderNu();};})(i);
+    wd.appendChild(g);
+  }
+  setEl('water-lbl',state.water+' / 8 Glaeser');
+}
+function renderSkin(){
+  var m=['Gesicht reinigen (Cleanser)','Toner (alcohol-free)','Vitamin C Serum','Moisturizer (leicht)','Sonnencreme SPF 50+'];
+  var e=['Micellar Water / Reinigungsoel','Cleanser (Abend)','BHA Salicylsaeure','Retinol (3x/Woche)','Moisturizer (reichhaltiger)'];
+  var sm=document.getElementById('skin-morning');if(sm)sm.innerHTML=m.map(function(s){return '<div class="check-item" onclick="this.classList.toggle(\'done\')"><div class="check-box"></div><span class="check-label">'+s+'</span></div>';}).join('');
+  var se=document.getElementById('skin-evening');if(se)se.innerHTML=e.map(function(s){return '<div class="check-item" onclick="this.classList.toggle(\'done\')"><div class="check-box"></div><span class="check-label">'+s+'</span></div>';}).join('');
+  var sl=document.getElementById('skin-log');if(sl&&state.skinLog.length>0)sl.innerHTML=state.skinLog.slice(-5).reverse().map(function(l){return '<div style="display:flex;align-items:center;gap:7px;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px"><span class="tag '+(l.s==='besser'?'t-green':l.s==='schlechter'?'t-red':'t-amber')+'">'+l.s+'</span><span style="color:var(--muted);font-family:JetBrains Mono,monospace;font-size:9px">'+l.d+'</span></div>';}).join('');
+}
+function renderSleep(){
+  var sl=document.getElementById('sleep-log');if(!sl)return;
+  if(!state.sleepLog.length){sl.innerHTML='<div style="font-size:12px;color:var(--muted)">Noch keine Eintraege.</div>';return;}
+  sl.innerHTML=state.sleepLog.slice(-7).reverse().map(function(e){return '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px"><div style="font-family:JetBrains Mono,monospace;font-size:9px;color:var(--muted)">'+e.date+'</div><div style="font-size:15px;font-weight:700;font-family:JetBrains Mono,monospace;color:var(--teal)">'+e.hours+'h</div><span class="tag '+(e.q==='top'||e.q==='gut'?'t-green':e.q==='ok'?'t-amber':'t-red')+'">'+e.q+'</span></div>';}).join('');
+}
+function renderGoals(){
+  var ms=[{y:'2025',l:'Ausbildung starten (Elektroniker EGB)'},{y:'2025',l:'Zwischenpruefung 1,0'},{y:'2026',l:'Erstes Business-Einkommen'},{y:'2027',l:'Ausbildung Abschluss 1,0'},{y:'2028',l:'Meister beginnen'},{y:'2029',l:'Meister Abschluss'},{y:'2030',l:'EPC-Unternehmen / AE Solar'},{y:'2031',l:'1.000.000€'}];
+  var tl=document.getElementById('goals-tl');if(tl)tl.innerHTML=ms.map(function(m,i){return '<div style="display:flex;gap:11px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--border)'+(i===ms.length-1?';border:none':'')+'"><span style="font-family:JetBrains Mono,monospace;font-size:10px;color:var(--accent);min-width:32px;padding-top:2px">'+m.y+'</span><div style="width:6px;height:6px;border-radius:50%;background:var(--dim);flex-shrink:0;margin-top:5px"></div><span style="font-size:12.5px;color:var(--text2)">'+m.l+'</span></div>';}).join('');
+  var mp=(state.money/1000000*100).toFixed(2);
+  setEl('g-m-pct',mp+'%');setStyle('g-m-bar','width',mp+'%');
+}
+function renderFinance(){
+  var m=state.money,pct=(m/1000000*100).toFixed(2);
+  setEl('fin-money',m.toLocaleString('de')+'€');
+  setEl('fin-pct',pct+'% erreicht');
+  setStyle('fin-bar','width',Math.min(100,parseFloat(pct))+'%');
+  var ti=state.incomes.reduce(function(a,b){return a+b.amount;},0);
+  setEl('fin-saved',state.saved.toLocaleString('de')+'€');
+  setEl('fin-srate','Sparquote: '+(ti>0?Math.round(state.saved/ti*100):0)+'%');
+  setEl('fin-inc-total',ti.toLocaleString('de')+'€');
+  var il=document.getElementById('inc-list');if(il)il.innerHTML=state.incomes.length?state.incomes.slice(-4).reverse().map(function(i){return '<div class="list-item"><div class="list-left"><span class="tag t-green">+'+i.amount+'€</span><span>'+i.source+'</span></div></div>';}).join(''):'<div style="font-size:12px;color:var(--muted)">Keine.</div>';
+  var el=document.getElementById('exp-list');if(el)el.innerHTML=state.expenses.length?state.expenses.slice(-4).reverse().map(function(e){return '<div class="list-item"><div class="list-left"><span class="tag t-red">-'+e.amount+'€</span><span>'+e.cat+'</span></div></div>';}).join(''):'<div style="font-size:12px;color:var(--muted)">Keine.</div>';
+  var spl=document.getElementById('spar-list');if(spl)spl.innerHTML=state.sparplan.length?state.sparplan.slice(-4).reverse().map(function(s){return '<div class="list-item"><div class="list-left"><span class="tag t-green">+'+s.amount+'€</span><span>'+s.source+'</span></div></div>';}).join(''):'<div style="font-size:12px;color:var(--muted)">Keine.</div>';
+}
+function renderInvest(){
+  var total=state.etf+state.tages+state.extraInv.reduce(function(a,b){return a+b.amount;},0);
+  setEl('etf-val',state.etf.toLocaleString('de')+'€');
+  setEl('tages-val',state.tages.toLocaleString('de')+'€');
+  setEl('inv-total',total.toLocaleString('de')+'€');
+  var ep=total>0?Math.round(state.etf/total*100):0,tp=total>0?Math.round(state.tages/total*100):0;
+  setEl('etf-pct',ep+'%');setStyle('etf-bar','width',ep+'%');
+  setEl('tages-pct',tp+'%');setStyle('tages-bar','width',tp+'%');
+  var ei=document.getElementById('extra-inv');if(ei)ei.innerHTML=state.extraInv.map(function(i){return '<div class="inv-card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px"><div style="font-size:13px;font-weight:500">'+i.name+'</div><span class="tag t-blue">'+i.typ+'</span></div><div style="font-size:17px;font-weight:700;font-family:JetBrains Mono,monospace;color:var(--green)">'+i.amount.toLocaleString('de')+'€</div></div>';}).join('');
+}
+function renderBiz(){
+  setEl('biz-umsatz',state.bizUmsatz.toLocaleString('de')+'€');
+  var bl=document.getElementById('biz-list');
+  if(bl&&state.ideas.length>0){var sc={Idee:'t-blue','In Arbeit':'t-amber',Aktiv:'t-green',Pausiert:'t-red'};bl.innerHTML=state.ideas.map(function(i){return '<div class="list-item"><div class="list-left"><span class="tag '+(sc[i.s]||'t-blue')+'">'+i.s+'</span><div><div style="font-size:12.5px">'+i.t+'</div>'+(i.n?'<div style="font-size:10px;color:var(--muted)">'+i.n+'</div>':'')+'</div></div></div>';}).join('');}
+}
+function renderSprachen(){
+  setEl('ru-str',state.ruStreak);setEl('zh-ses',state.zhSessions);setEl('books',state.books);setEl('kurse',state.courses);
+  var nl=document.getElementById('noten-list');if(nl)nl.innerHTML=state.noten.length?state.noten.map(function(n){return '<div class="list-item"><div class="list-left"><span class="tag '+(parseFloat(n.g.replace(',','.'))<2?'t-green':parseFloat(n.g.replace(',','.'))<3?'t-amber':'t-red')+'">'+n.g+'</span><span>'+n.f+'</span></div></div>';}).join(''):'<div style="font-size:12px;color:var(--muted)">Keine Noten.</div>';
+}
+function renderJournal(){
+  var je=document.getElementById('j-entries');if(!je)return;
+  je.innerHTML=state.journals.slice(-8).reverse().map(function(j){return '<div class="j-entry"><div class="j-date">'+j.date+'</div><div class="j-text">'+j.text+'</div></div>';}).join('');
+}
+function renderWR(){
+  var wl=document.getElementById('wr-list');if(!wl)return;
+  wl.innerHTML=state.weekReviews.slice(-4).reverse().map(function(r){return '<div class="card"><div class="card-header"><div class="card-title">KW '+r.kw+' — '+r.date+'</div></div><div style="font-size:12px;line-height:1.7;color:var(--text2)">'+(r.gut?'<div style="margin-bottom:7px"><span class="tag t-green">Gut</span><div style="margin-top:3px">'+r.gut+'</div></div>':'')+(r.schlecht?'<div style="margin-bottom:7px"><span class="tag t-red">Nicht gut</span><div style="margin-top:3px">'+r.schlecht+'</div></div>':'')+(r.ziel?'<div><span class="tag t-blue">Naechste Woche</span><div style="margin-top:3px">'+r.ziel+'</div></div>':'')+'</div></div>';}).join('');
+}
+function renderReisen(){
+  var re=document.getElementById('reise-extra');if(!re||!state.reiseLog.length)return;
+  re.innerHTML=state.reiseLog.map(function(r){return '<div class="j-entry"><div class="j-date">'+r.ort+'</div><div class="j-text">'+r.text+'</div></div>';}).join('');
+}
+function toggleTask(id){state.tasks=state.tasks.map(function(t){return t.id===id?Object.assign({},t,{done:!t.done}):t;});S.set('tasks',state.tasks);renderTasks();renderDash();}
+function logGym(){if(state.isKrank)return;if(state.gymDays.indexOf(today)>-1)return;state.gymDays.push(today);var y=new Date();y.setDate(y.getDate()-1);var yd=y.toDateString();if(state.lastGym===yd||state.lastGym===today)state.streak++;else if(state.lastGym!==today)state.streak=1;state.lastGym=today;S.set('streak',state.streak);S.set('lastGym',state.lastGym);S.set('gymDays',state.gymDays);renderGym();renderDash();}
+function logKrank(){if(state.kranDays.indexOf(today)>-1)return;state.kranDays.push(today);state.isKrank=true;state.kranktage++;S.set('kranDays',state.kranDays);S.set('isKrank_'+today,true);S.set('kranktage',state.kranktage);renderGym();renderDash();}
+function resetDay(){state.tasks=state.tasks.map(function(t){return Object.assign({},t,{done:false});});state.protein=0;state.kcal=0;state.carbs=0;state.fat=0;state.water=0;state.isKrank=false;S.set('tasks',state.tasks);S.set('p_'+today,0);S.set('k_'+today,0);S.set('c_'+today,0);S.set('f_'+today,0);S.set('w_'+today,0);renderDash();renderTasks();renderNu();}
+function addMacros(){state.protein+=parseInt(document.getElementById('add-p').value)||0;state.kcal+=parseInt(document.getElementById('add-k').value)||0;state.carbs+=parseInt(document.getElementById('add-c').value)||0;state.fat+=parseInt(document.getElementById('add-f').value)||0;S.set('p_'+today,state.protein);S.set('k_'+today,state.kcal);S.set('c_'+today,state.carbs);S.set('f_'+today,state.fat);['add-p','add-k','add-c','add-f'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});renderNu();}
+function addWater(){if(state.water<8){state.water++;S.set('w_'+today,state.water);renderNu();}}
+function logSkin(s){state.skinLog.push({s:s,d:new Date().toLocaleDateString('de')});S.set('skinLog',state.skinLog);renderSkin();}
+function setSQ(q){state.sleepQ=q;S.set('sq_'+today,q);document.querySelectorAll('.sq-btn').forEach(function(b){b.className='sq-btn';});var map={schlecht:'sq-schlecht',ok:'sq-ok',gut:'sq-gut',top:'sq-top'};var btn=document.getElementById(map[q]);if(btn)btn.className='sq-btn '+(q==='schlecht'?'sq-bad':q==='ok'?'sq-ok':'sq-good');}
+function saveSleep(){var s=document.getElementById('sleep-s').value,e=document.getElementById('sleep-e').value;if(!s||!e)return;var sa=s.split(':').map(Number),ea=e.split(':').map(Number);var h=ea[0]-sa[0]+(ea[1]-sa[1])/60;if(h<0)h+=24;h=Math.round(h*10)/10;state.sleepLog.push({date:new Date().toLocaleDateString('de'),hours:h,q:state.sleepQ||'—'});S.set('sleepLog',state.sleepLog);renderSleep();}
+function updFinance(){var v=parseInt(document.getElementById('fin-inp').value);if(v){state.money=v;S.set('money',v);renderFinance();renderDash();}document.getElementById('fin-inp').value='';}
+function investETF(){var a=parseInt(document.getElementById('etf-inp').value)||0;if(!a)return;state.etf+=a;S.set('etf',state.etf);document.getElementById('etf-inp').value='';renderInvest();}
+function investTages(){var a=parseInt(document.getElementById('tages-inp').value)||0;if(!a)return;state.tages+=a;S.set('tages',state.tages);document.getElementById('tages-inp').value='';renderInvest();}
+function addBiz(){var a=parseInt(document.getElementById('biz-inp').value)||0;state.bizUmsatz+=a;S.set('bizUmsatz',state.bizUmsatz);document.getElementById('biz-inp').value='';document.getElementById('biz-desc').value='';renderBiz();}
+function updWeight(){var w=prompt('Gewicht (kg):');if(w&&!isNaN(w)){state.weight=parseFloat(w);S.set('weight',state.weight);renderGym();renderDash();}}
+function updKFA(){var k=prompt('KFA (%):');if(k&&!isNaN(k)){state.kfa=parseFloat(k);S.set('kfa',state.kfa);renderGym();}}
+function addRu(){state.ruStreak++;S.set('ruStreak',state.ruStreak);renderSprachen();}
+function addZh(){state.zhSessions++;S.set('zhSessions',state.zhSessions);renderSprachen();}
+function addBook(){state.books++;S.set('books',state.books);renderSprachen();}
+function addKurs(){state.courses++;S.set('courses',state.courses);renderSprachen();}
+function saveJournal(){var t=document.getElementById('j-today').value.trim();if(!t)return;state.journals.push({text:t,date:new Date().toLocaleDateString('de')});S.set('journals',state.journals);document.getElementById('j-today').value='';renderJournal();}
+function saveFocus(){
+  var val=document.getElementById('focus-today').value.trim();
+  if(!val)return;
+  S.set('focus_'+today,val);
+  var disp=document.getElementById('focus-display');
+  if(disp){disp.textContent='"'+val+'"';disp.style.display='block';}
+  document.getElementById('focus-today').value='';
+}
+function loadFocus(){
+  var val=S.get('focus_'+today,'');
+  if(val){
+    var disp=document.getElementById('focus-display');
+    if(disp){disp.textContent='"'+val+'"';disp.style.display='block';}
+  }
+}
+function saveWR(){var gut=document.getElementById('wr-gut').value.trim(),schlecht=document.getElementById('wr-schlecht').value.trim(),lern=document.getElementById('wr-lern').value.trim(),ziel=document.getElementById('wr-ziel').value.trim();state.weekReviews.push({kw:getKW(),date:new Date().toLocaleDateString('de'),gut:gut,schlecht:schlecht,lern:lern,ziel:ziel});S.set('wr',state.weekReviews);['wr-gut','wr-schlecht','wr-lern','wr-ziel'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});renderWR();}
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.modal-overlay').forEach(function(o){o.addEventListener('click',function(e){if(e.target===o)o.classList.remove('open');});});
+function saveTask(){var n=document.getElementById('mt-name').value.trim(),c=document.getElementById('mt-cat').value;if(!n)return;state.tasks.push({id:Date.now(),label:n,cat:c,done:false});S.set('tasks',state.tasks);closeModal('m-task');renderTasks();}
+function savePR(){var ex=document.getElementById('pr-ex').value.trim(),kg=document.getElementById('pr-kg').value,rep=document.getElementById('pr-rep').value;if(!ex)return;state.prs=state.prs.filter(function(p){return p.ex!==ex;});state.prs.push({ex:ex,kg:kg,rep:rep});S.set('prs',state.prs);closeModal('m-pr');renderGym();}
+function saveInc(){var a=parseInt(document.getElementById('inc-amt').value)||0,s=document.getElementById('inc-src').value.trim()||'Sonstiges';state.incomes.push({amount:a,source:s});S.set('incomes',state.incomes);closeModal('m-inc');renderFinance();}
+function saveExp(){var a=parseInt(document.getElementById('exp-amt').value)||0,c=document.getElementById('exp-cat').value.trim()||'Sonstiges';state.expenses.push({amount:a,cat:c});S.set('expenses',state.expenses);closeModal('m-exp');renderFinance();}
+function saveSpar(){var a=parseInt(document.getElementById('spar-amt').value)||0,s=document.getElementById('spar-src').value.trim()||'Spareinlage';state.sparplan.push({amount:a,source:s,date:new Date().toLocaleDateString('de')});state.saved+=a;S.set('sparplan',state.sparplan);S.set('saved',state.saved);closeModal('m-spar');renderFinance();}
+function saveInv(){var n=document.getElementById('inv-name').value.trim(),t=document.getElementById('inv-typ').value,a=parseInt(document.getElementById('inv-amt').value)||0;if(!n)return;state.extraInv.push({name:n,typ:t,amount:a});S.set('extraInv',state.extraInv);closeModal('m-inv');renderInvest();}
+function saveIdea(){var t=document.getElementById('idea-t').value.trim(),s=document.getElementById('idea-s').value,n=document.getElementById('idea-n').value.trim();if(!t)return;state.ideas.push({t:t,s:s,n:n});S.set('ideas',state.ideas);closeModal('m-idea');renderBiz();}
+function saveNote(){var f=document.getElementById('note-f').value.trim(),g=document.getElementById('note-g').value.trim();if(!f)return;state.noten.push({f:f,g:g});S.set('noten',state.noten);closeModal('m-note');renderSprachen();}
+function saveReise(){var o=document.getElementById('r-ort').value.trim(),t=document.getElementById('r-text').value.trim();if(!o)return;state.reiseLog.push({ort:o,text:t});S.set('reiseLog',state.reiseLog);closeModal('m-reise');renderReisen();}
+var THEMEN=[
+{id:'vor_aderfarben',jahr:'0',typ:'voraus',fach:'Basics',farbe:'#34d399',name:'Aderfarben & Leitungsbelegung',lead:'EU-weit genormte Aderfarben. Falsche Belegung kann toedlich sein.',erklaerung:'<p>Seit 2004 gilt DIN VDE 0100-510. <strong>L1=Braun</strong> (Aussenseiter Phase 1). <strong>L2=Schwarz</strong> (Phase 2). <strong>L3=Grau</strong> (Phase 3). <strong>N=Blau</strong> (Neutralleiter — unter Last stromfuehrend!). <strong>PE=Gruen-Gelb</strong> (Schutzleiter, NIE als Stromleiter!).</p><p>Altinstallation (vor 2004): Rot=L, Schwarz=N, Gruen=PE. IMMER nachmessen!</p>',aderfarben:true,formeln:[],merksatz:'GN-YE = PE = NIEMALS als Stromleiter! Blau = N = unter Last stromfuehrend! Altinstallation nachmessen!',praxistipps:['N fuehrt unter Last Strom — er ist nicht sicher!','5-adrig NYM-J: braun,schwarz,grau=L1,L2,L3 — blau=N — gruen-gelb=PE.'],fehler:[{t:'PE als Stromleiter',text:'Absolut verboten. Gehaeuse kommen unter Spannung.'},{t:'N und PE tauschen',text:'N ist stromfuehrend, PE ist Schutzleiter. Falsch = lebensgefaehrlich.'}],normen:[{nr:'DIN VDE 0100-510',text:'Farbkennzeichnung von Leitern. Verbindlich fuer alle Neuinstallationen.'}],aufgaben:[{nr:'1',text:'Braun, Blau, Gruen-Gelb. Welche Funktion?',lsg:'Braun=L (Aussenseiter), Blau=N (Neutral), Gruen-Gelb=PE (Schutzleiter)'},{nr:'2',text:'Welche Farben hat NYM-J 5x2,5mm2?',lsg:'Braun (L1), Schwarz (L2), Grau (L3), Blau (N), Gruen-Gelb (PE)'}]},
+{id:'vor_strom',jahr:'0',typ:'voraus',fach:'Basics',farbe:'#4a9eff',name:'Was ist elektrischer Strom?',lead:'Elektrischer Strom ist die gerichtete Bewegung von Elektronen.',erklaerung:'<p>In Metallen sind Valenzelektronen frei beweglich. Legt man Spannung an -> Elektronen fliessen gerichtet -> elektrischer Strom I.</p><p><strong>Technische Stromrichtung:</strong> Von + nach -. Physikalisch fliessen Elektronen von - nach +.</p><p><strong>Gute Leiter:</strong> Kupfer, Silber, Aluminium. <strong>Isolatoren:</strong> Kunststoff, Glas, Gummi.</p>',aderfarben:false,formeln:[{label:'Strom I',f:'I = Q / t',erkl:'Ladung Q in Coulomb pro Zeit t in Sekunden'},{label:'Einheit',f:'1 A = 6,24 x 10^18 Elektronen/Sekunde',erkl:''}],merksatz:'Strom fliesst nur im GESCHLOSSENEN Kreislauf. Kein Rueckleiter = kein Strom.',praxistipps:['Kupfer leitet ca. 60x besser als Eisen.','Strom braucht immer Hin- UND Rueckleiter (L und N).'],fehler:[{t:'Offener Kreislauf',text:'Ohne geschlossenen Kreis fliesst kein Strom — auch wenn Spannung anliegt.'}],normen:[],aufgaben:[{nr:'1',text:'Warum fliesst kein Strom durch Gummi?',lsg:'Gummi ist Isolator: Elektronen fest gebunden, keine freien Ladungstraeger.'}]},
+{id:'vor_werkzeug',jahr:'0',typ:'voraus',fach:'Praxis',farbe:'#fb923c',name:'Werkzeuge & VDE-Ausruestung',lead:'VDE-geprueft ist Pflicht — kein Nice-to-have.',erklaerung:'<p><strong>VDE-Werkzeug</strong> ist bis 1000V AC isoliert nach DIN EN 60900.</p><p><strong>Zweipoliger Spannungspruefer</strong> (z.B. Benning, Fluke T5): Einziges normkonformes Pruefmittel. Einpoliger Schraubendreher-Pruefer verboten!</p><p><strong>Multimeter:</strong> CAT III 600V Minimum. <strong>True-RMS</strong> fuer verzerrte Signale.</p>',aderfarben:false,formeln:[],merksatz:'VDE-Werkzeug Pflicht! Einpoliger Phasenpruefer verboten. Immer zweipoliger Pruefer!',praxistipps:['Kabelstripper: richtige Querschnittgroesse.','Multimeter: erst hoechsten Bereich, dann runterregeln.'],fehler:[{t:'Einpoliger Pruefer',text:'Kann durch kapazitive Einkopplung falsch anzeigen. Nie als alleiniges Pruefmittel!'},{t:'Widerstand unter Spannung',text:'Messgeraet wird zerstoert!'}],normen:[{nr:'DIN EN 60900',text:'Handwerkzeug fuer Arbeiten unter Spannung bis 1000V AC.'}],aufgaben:[{nr:'1',text:'5 Schritte vor Arbeiten an Steckdose?',lsg:'1. Freischalten (LSS aus)\n2. Gegen Wiedereinschalten sichern\n3. Spannungsfreiheit messen (zweipoliger Pruefer)\n4. Erden wenn noetig\n5. Benachbarte Teile abdecken'}]},
+{id:'vor_drehstrom',jahr:'0',typ:'voraus',fach:'Basics',farbe:'#4a9eff',name:'Drehstrom verstehen',lead:'Jede Fabrik, jeder Herd, jede Wallbox laeuft damit.',erklaerung:'<p><strong>Sternschaltung (Y):</strong> Phase-N = 230V. Phase-Phase = 400V.</p><p><strong>Dreieckschaltung (Delta):</strong> Kein Sternpunkt. 3-Leiter. Strangspannung = Leiterspannung = 400V.</p><p><strong>Verkettungsfaktor Wurzel3 = 1,732:</strong> 230V x 1,732 = 400V.</p>',aderfarben:false,formeln:[{label:'Leiterspannung',f:'U_L = sqrt(3) x U_Str = 1,732 x 230V = 400V',erkl:''},{label:'Drehstrom-Leistung',f:'P = sqrt(3) x U_L x I_L x cos(phi)',erkl:'Symmetrische Last'},{label:'Motorstrom',f:'I_L = P / (sqrt(3) x U_L x cos(phi))',erkl:''}],merksatz:'Steckdose = 230V (Phase-N). Herd = 400V (Phase-Phase). Drehrichtung aendern: 2 Aussenleiter tauschen.',praxistipps:['Herd: 5-adrig (L1,L2,L3,N,PE), eigener Drehstromkreis 3x16A.','Motor Stern: U_Str=231V. Motor Dreieck: U_Str=400V.'],fehler:[{t:'Phasen- mit Leiterspannung verwechseln',text:'230V != 400V. Falscher Anschluss -> Motor ueberhitzt.'},{t:'Motor Delta an 400V statt Stern',text:'Typenschild Y/400V D/690V: Im Stern an 400V betreiben!'}],normen:[{nr:'IEC 60038',text:'Normspannungen: 230/400V, 50Hz fuer Europa.'}],aufgaben:[{nr:'1',text:'U_L=400V, Stern. Wie gross ist U_Str?',lsg:'U_Str = 400/1,732 = 231V'},{nr:'2',text:'Herd P=8kW, U_L=400V, cosfi=1. I_L?',lsg:'I_L = 8000/(1,732x400x1) = 11,55A -> 16A-Kreis reicht'}]},
+{id:'lj1_ohm',jahr:'1',typ:'bs',fach:'Elektrotechnik',farbe:'#4a9eff',name:'Ohmsches Gesetz & Grundgroessen',lead:'U=R*I muss im Schlaf sitzen. Das Fundament der Elektrotechnik.',erklaerung:'<p><strong>Spannung U</strong> (Volt): Treibende Kraft. <strong>Strom I</strong> (Ampere): Elektronen pro Zeit. <strong>Widerstand R</strong> (Ohm): Bremst den Strom. <strong>Leistung P</strong> (Watt): Energie pro Zeit.</p><p>Gilt nur fuer lineare Widerstaende. NICHT fuer Kondensatoren, Spulen, Dioden.</p>',aderfarben:false,formeln:[{label:'Ohmsches Gesetz',f:'U = R x I',erkl:'Spannung = Widerstand x Strom'},{label:'Nach R',f:'R = U / I',erkl:''},{label:'Nach I',f:'I = U / R',erkl:''},{label:'Leistung',f:'P = U x I = I^2 x R = U^2 / R',erkl:'Alle 3 Formen merken!'},{label:'Energie',f:'W = P x t (Wh oder J)',erkl:''},{label:'Spez. Widerstand',f:'R = rho x l / A',erkl:'rho_Cu = 0,0178 Ohm*mm2/m'}],merksatz:'URI-Dreieck: U oben, R und I unten. P=U*I nie vergessen! Erst Formel umstellen, dann Zahlen.',praxistipps:['Einheiten IMMER mitschreiben.','Probe: Ergebnis in Ausgangsformel einsetzen.','rho_Cu=0,0178, rho_Al=0,028. Auswendig!'],fehler:[{t:'Einheiten vergessen',text:'R=U/I=12V/2A=6 Ohm. Einheit immer angeben.'},{t:'Zahlen vor Umstellen',text:'Erst Formel umstellen, DANN Zahlen einsetzen.'}],normen:[],aufgaben:[{nr:'1',text:'R=470 Ohm, U=12V. Berechne I und P.',lsg:'I = U/R = 12/470 = 25,5mA\nP = U*I = 12*0,0255 = 0,306W = 306mW'},{nr:'2',text:'Cu-Kabel l=25m, A=2,5mm2. R Hin+Rueck?',lsg:'R = 0,0178*25/2,5 = 0,178 Ohm\nR_ges = 2*0,178 = 0,356 Ohm'}]},
+{id:'lj1_reihe_para',jahr:'1',typ:'bs',fach:'Elektrotechnik',farbe:'#4a9eff',name:'Reihen- und Parallelschaltung',lead:'Zwei Grundschaltungen — komplett gegensaetzliche Eigenschaften.',erklaerung:'<p><strong>Reihenschaltung:</strong> Strom hat einen Weg -> ueberall gleich. Spannung teilt sich auf.<br><strong>Parallelschaltung:</strong> Gleiche Spannung an allen. Strom teilt sich auf. R_ges kleiner als kleinster Einzelwiderstand.</p><p>Hausinstallation = Parallel! Alle Verbraucher haben 230V.</p>',aderfarben:false,formeln:[{label:'Reihe R_ges',f:'R_ges = R1 + R2 + R3',erkl:'Addieren sich'},{label:'Reihe Strom',f:'I = I1 = I2 = I3',erkl:'Ueberall gleich'},{label:'Spannungsteiler',f:'Ux = U_ges * Rx / R_ges',erkl:''},{label:'Parallel 2 Wid.',f:'R_ges = (R1 * R2) / (R1 + R2)',erkl:'Produkt durch Summe'},{label:'Parallel Strom',f:'I_ges = I1 + I2 + I3',erkl:'Addieren sich'}],merksatz:'Reihe: Strom gleich, Spannung teilt sich. Parallel: Spannung gleich, Strom teilt sich. Gleiche Spannung? -> Parallel!',praxistipps:['Kehrwert am Ende bilden bei Parallelformel!','R_ges parallel IMMER kleiner als kleinster Einzelwiderstand.'],fehler:[{t:'Kehrwert vergessen',text:'1/R_ges=0,01 -> R_ges=100 Ohm nicht 0,01 Ohm!'},{t:'Verwechslung',text:'Gleicher Strom ueberall? -> Reihe. Gleiche Spannung? -> Parallel.'}],normen:[],aufgaben:[{nr:'1',text:'R1=100, R2=220, R3=470 Ohm Reihe, U=12V. R_ges, I, alle U?',lsg:'R_ges=790 Ohm\nI=12/790=15,19mA\nU1=1,52V, U2=3,34V, U3=7,14V'},{nr:'2',text:'R1=1k parallel R2=2,2k, U=5V. R_ges, I?',lsg:'R_ges=(1000*2200)/3200=687,5 Ohm\nI_ges=7,27mA, I1=5mA, I2=2,27mA'}]},
+{id:'lj1_fi',jahr:'1',typ:'praxis',fach:'Schutz',farbe:'#f87171',name:'FI/RCD-Schutzschalter',lead:'Der FI ist die wichtigste Lebensrettungsmassnahme der Elektrotechnik.',erklaerung:'<p><strong>Prinzip:</strong> Vergleicht I_hin (L) mit I_rueck (N). Bei Differenz >= I_Delta_n -> Ausloesung in unter 300ms.</p><p><strong>Typen:</strong> Typ AC (nur Wechselfehlerstr.), Typ A (Standard heute, auch puls. DC), Typ B (alle inkl. glatter DC, fuer PV, FU, E-Auto).</p>',aderfarben:false,formeln:[{label:'Ausloesung',f:'|I_L - I_N| >= I_Delta_n -> auslösen',erkl:'30mA = Personenschutz, 300mA = Brandschutz'},{label:'Auslösezeit',f:'t unter 300ms bei I_Delta_n, unter 40ms bei 5*I_Delta_n',erkl:''}],merksatz:'30mA = Personenschutz. 300mA = Brandschutz. Typ A fuer alle modernen Geraete. Typ B fuer PV und E-Auto. Monatlich testen!',praxistipps:['Monatlich T-Taste druecken!','FI schuetzt NICHT gegen gleichzeitiges Beruehren L und N.','FI vor die LSS einbauen.'],fehler:[{t:'FI Typ AC fuer Elektronik',text:'WM, FU -> DC-Fehlerstroeme -> Typ A minimum!'},{t:'Niemals testen',text:'Defekte FIs sind unsichtbar.'}],normen:[{nr:'VDE 0100-410',text:'Regelt wo FI vorgeschrieben.'},{nr:'IEC 61008',text:'Bauteilanforderungen FI.'}],aufgaben:[{nr:'1',text:'R_Koerper=2000 Ohm, U=230V. Strom? Loest 30mA-FI aus?',lsg:'I=230/2000=115mA\n115mA >> 30mA -> FI loest aus!\n115mA ist ueber Herzflimmerschwelle ~80mA -> ohne FI toedlich'},{nr:'2',text:'Welchen FI-Typ fuer PV-Wechselrichter?',lsg:'Typ B: PV-WR erzeugt glatte DC-Fehlerstroeme. Typ AC und A erkennen diese nicht.'}]},
+{id:'lj1_lss',jahr:'1',typ:'bs',fach:'Schutz',farbe:'#f87171',name:'Leitungsschutzschalter (LSS/MCB)',lead:'Falsch dimensioniert kann er Kabelbrand nicht verhindern.',erklaerung:'<p><strong>Thermisch:</strong> Ueberlast -> traege Ausloesung. <strong>Magnetisch:</strong> Kurzschluss -> sofort unter 10ms.</p><p><strong>Charakteristiken:</strong> B: 3-5x I_n (Wohnbereich). C: 5-10x I_n (Motoren, Pumpen). D: 10-20x I_n (Schweissgeraete).</p>',aderfarben:false,formeln:[{label:'Dimensionierung',f:'I_LSS <= I_zul(Leitung)',erkl:'LSS muss kleiner oder gleich zulaessigem Leiterstrom sein'},{label:'Charakteristiken',f:'B: 3-5xIn | C: 5-10xIn | D: 10-20xIn',erkl:''}],merksatz:'B fuer Basis/Beleuchtung. C fuer Compressor/Motor. 1,5mm2->B10A, 2,5mm2->B16A, 4mm2->B25A, 6mm2->B32A.',praxistipps:['Selektivitaet: Untergeordneter LSS kleiner als uebergeordneter.','Nach Kurzschluss: LSS pruefen.'],fehler:[{t:'LSS zu gross',text:'16A-LSS an 1,5mm2: Kabel haelt 13,5A, LSS loest erst bei 80A aus -> Kabelbrand!'},{t:'B-Char fuer Motor',text:'Motor hat 6x Anlaufstrom. B-LSS loest beim Anlauf aus -> C-Char!'}],normen:[{nr:'DIN EN 60898-1',text:'LSS fuer Hausinstallation.'}],aufgaben:[{nr:'1',text:'a) Beleuchtung 1,5mm2 b) Waschmaschine c) Pumpenmotor — welcher LSS?',lsg:'a) B10A — Beleuchtung ohmsich\nb) C16A — WM mit Motor -> C-Char\nc) C10A/C16A — induktiv -> C'}]},
+{id:'lj1_sicherheitsregeln',jahr:'1',typ:'praxis',fach:'Sicherheit',farbe:'#f87171',name:'Die 5 Sicherheitsregeln',lead:'Diese 5 Regeln retten Leben. Jeden Tag. Ohne Ausnahme.',erklaerung:'<p><strong>1. Freischalten:</strong> Alle Stromkreise freischalten. Auch Hilfsstromkreise!</p><p><strong>2. Gegen Wiedereinschalten sichern:</strong> Schloss, Schild, Sicherung mitnehmen.</p><p><strong>3. Spannungsfreiheit feststellen:</strong> Zweipoliger Pruefer, alle Leiter gegen alle anderen = 0V.</p><p><strong>4. Erden und Kurzschliessen:</strong> Bei Hochspannung und PV Pflicht.</p><p><strong>5. Benachbarte Teile abdecken:</strong> Isolierhauben, Abdeckplatten.</p>',aderfarben:false,formeln:[],merksatz:'FreiSiSpErdAb. In dieser Reihenfolge. Immer. PV: DC-Seite fuehrt bei Licht IMMER Spannung!',praxistipps:['Sicherung mitnehmen -> niemand kann einschalten.','PV: Auch nach AC-Freischalten DC messen!','Kollegen informieren.'],fehler:[{t:'Nur Sicherung raus ohne Messen',text:'Vielleicht gibt es zweiten Zuleitungspfad. Ohne Messung keine Sicherheit.'},{t:'Einpoliger Pruefer',text:'Nur zweipoliger VDE-Pruefer ist normkonform!'}],normen:[{nr:'VDE 0105-100',text:'Betrieb elektrischer Anlagen. Definiert die 5 Sicherheitsregeln.'},{nr:'DGUV Vorschrift 3',text:'Para 8: Nur Elektrofachkraefte an elektrischen Anlagen.'}],aufgaben:[{nr:'1',text:'Steckdose tauschen — alle 5 Schritte konkret.',lsg:'1. LSS aus\n2. LSS sichern + Schild\n3. Zweipoliger Pruefer: L-N, L-PE, N-PE = alle 0V\n4. PV-nahe Kreise: DC trennen\n5. Benachbarte Leiter abdecken\n-> JETZT erst arbeiten'}]},
+{id:'lj1_installation',jahr:'1',typ:'praxis',fach:'Installation',farbe:'#34d399',name:'Gebaeude-installation Grundlagen',lead:'HAK -> HV -> UV -> Endstromkreise. Die Hierarchie der Hausinstallation.',erklaerung:'<p><strong>HAK:</strong> Hausanschlusskasten, NUR EVU! <strong>HV:</strong> Zähler, Hauptsicherung. <strong>UV:</strong> FI + LSS fuer alle Endkreise. <strong>Kabel:</strong> NYM-J = Innen, NYY-J = Aussen/Erde.</p>',aderfarben:false,formeln:[{label:'Steckdose',f:'16A -> min. 1,5mm2 (besser 2,5mm2)',erkl:''},{label:'Herd',f:'3x16-20A -> min. 4-6mm2, 5-adrig',erkl:''}],merksatz:'Steckdosen IMMER parallel. Herd braucht Drehstrom. Bad: FI 30mA Pflicht. Kueche: Herd eigener Kreis.',praxistipps:['Steckdosen: 16A B-LSS + FI 30mA Typ A.','Bad: Keine Steckdosen unter 60cm von Wanne.','Leerrohre: 20% Reserve.'],fehler:[{t:'Steckdose ohne FI im Bad',text:'VDE 0100-700: FI 30mA Pflicht!'},{t:'Herd auf Einphasenkreis',text:'Herd braucht Drehstromanschluss 3x16A oder 3x20A.'}],normen:[{nr:'VDE 0100-700',text:'Raeume mit Wanne/Dusche. Schutzbereiche 0-3.'}],aufgaben:[{nr:'1',text:'Kabel fuer: a) Steckdose in der Wand b) Gartenpumpe im Erdreich?',lsg:'a) NYM-J 3x2,5mm2 — Feuchtraumkabel innen\nb) NYY-J — Erdkabel, UV-bestaendig'}]},
+{id:'lj2_wechselstrom',jahr:'2',typ:'bs',fach:'Wechselstromtechnik',farbe:'#fbbf24',name:'Wechselstrom — Kenngroessen & Effektivwert',lead:'Scheitelwert vs. Effektivwert. Wer das verwechselt, verbaut falsche Kondensatoren.',erklaerung:'<p>50Hz Sinuswelle. <strong>Effektivwert</strong> = gleiche Waerme wie DC = 230V. <strong>Scheitelwert</strong> = Maximum = 230V x Wurzel2 = 325V. Bauteile muessen Scheitelwert aushalten -> mindestens 400V-Kondensatoren!</p>',aderfarben:false,formeln:[{label:'Frequenz/Periode',f:'f = 1/T, T = 1/f',erkl:'f=50Hz -> T=20ms'},{label:'Scheitelwert',f:'Uhat = U_eff x sqrt(2) = 1,414 x 230 = 325V',erkl:''},{label:'Effektivwert',f:'U_eff = Uhat / sqrt(2) = 0,707 x Uhat',erkl:''}],merksatz:'230V = Effektivwert. Scheitelwert = 325V. Kondensatoren min. 400V! 50Hz -> T=20ms.',praxistipps:['True-RMS Multimeter bei verzerrten Signalen.','50Hz -> 3000U/min beim 2-poligen Synchronmotor.'],fehler:[{t:'230V als Scheitelwert',text:'230V ist EFFEKTIVWERT. Scheitel=325V. Kondensatoren ohne 400V-Auslegung koennen durchschlagen.'}],normen:[{nr:'EN 50160',text:'Netzspannungsqualitaet: 230V +-10%, 50Hz +-1%.'}],aufgaben:[{nr:'1',text:'f=50Hz. T, omega, Uhat bei 230V?',lsg:'T=1/50=0,02s=20ms\nomega=2*pi*50=314,2rad/s\nUhat=230*1,414=325,2V'},{nr:'2',text:'Warum 400V-Kondensator fuer 230V?',lsg:'Scheitelwert=325V. +10% Toleranz: 253V*1,414=358V. Mit Sicherheit -> 400V oder 450V.'}]},
+{id:'lj2_cosfi',jahr:'2',typ:'bs',fach:'Wechselstromtechnik',farbe:'#fbbf24',name:'Leistungsfaktor cos phi & Leistungsdreieck',lead:'Wirkleistung, Blindleistung, Scheinleistung — begleitet jeden Elektriker.',erklaerung:'<p><strong>Wirkleistung P [W]:</strong> Wird in Arbeit umgewandelt. <strong>Blindleistung Q [VAr]:</strong> Pendelt, macht keine Arbeit, belastet Netz. <strong>Scheinleistung S [VA]:</strong> Geometrische Summe. Fuer Kabel/Trafo-Dimensionierung!</p>',aderfarben:false,formeln:[{label:'Wirkleistung',f:'P = U * I * cos(phi)   [W]',erkl:''},{label:'Blindleistung',f:'Q = U * I * sin(phi)   [VAr]',erkl:''},{label:'Scheinleistung',f:'S = U * I   [VA]',erkl:''},{label:'Leistungsdreieck',f:'S^2 = P^2 + Q^2',erkl:'Pythagoras!'},{label:'Leistungsfaktor',f:'cos(phi) = P / S',erkl:''}],merksatz:'S^2 = P^2 + Q^2 (Pythagoras). cos phi=1 = ideal. Motor mit cos phi=0,8: Kabel muss 25% mehr Strom tragen!',praxistipps:['Kondensatorbatterie kompensiert induktive Blindleistung.','LED-Netzteile ohne PFC: cos phi oft 0,5-0,7!'],fehler:[{t:'VA = W gleichsetzen',text:'2,2kW-Motor mit cosfi=0,8 -> S=2,75kVA. Kabel fuer Scheinleistung dimensionieren!'}],normen:[],aufgaben:[{nr:'1',text:'Motor P=4kW, cosfi=0,8, U=400V Drehstrom. S, Q, I?',lsg:'S=P/cosfi=4/0,8=5kVA\nQ=sqrt(25-16)=3kVAr\nI=5000/(sqrt(3)*400)=5000/692,8=7,22A'}]},
+{id:'lj2_untervert',jahr:'2',typ:'praxis',fach:'Installation',farbe:'#34d399',name:'Unterverteilung — Aufbau & Verdrahtung',lead:'Der UV ist das Herzstueck jeder Installation.',erklaerung:'<p>Einspeisung -> Ueberspannungsschutz Typ 2 -> FI-Schutzschalter -> LSS. N-Schiene BLAU, PE-Schiene GRUEN-GELB. Selektivitaet: UV-LSS 16A, HV-LSS 63A -> Kurzschluss loest richtigen aus. Beschriftung Pflicht. 20% Reserveplaetze.</p>',aderfarben:false,formeln:[{label:'Selektivitaet (Faustformel)',f:'I_n(oben) >= 1,6 x I_n(unten)',erkl:'Sichere Selektivitaet'}],merksatz:'N-Schiene BLAU. PE-Schiene GRUEN-GELB. Nie tauschen! Beschriftung Pflicht! 20% Reserve!',praxistipps:['Beschriftung gesetzlich Pflicht.','Reserveplaetze einplanen.','Anzugsmomente: 2-3Nm.'],fehler:[{t:'N und PE tauschen',text:'N stromfuehrend, PE Schutzleiter. Falsch -> Gehaeuse unter Spannung.'},{t:'Kein Protokoll',text:'Rechtlich haftbar! Ohne Dokumentation -> volle Haftung.'}],normen:[{nr:'DIN EN 61439-1',text:'Niederspannungs-Schaltgeraetekombinationen.'}],aufgaben:[{nr:'1',text:'UV planen fuer: Licht WZ, 3 Steckdosen, Herd, WM, Bad.',lsg:'FI 40A 4-pol Typ A\nFI 25A 2-pol Typ A (Bad separat)\nB10A Licht, B16A 3x Steckdosen, C16A WM, B20A Herd, B10A Bad\n-> ca. 18TE Verteiler + 20% Reserve'}]},
+{id:'lj2_messen',jahr:'2',typ:'praxis',fach:'Messen',farbe:'#c084fc',name:'Messen & Pruefen nach VDE',lead:'Multimeter + Erstpruefung: ohne Protokoll ist die Anlage nicht abgenommen.',erklaerung:'<p><strong>CAT-Kategorien:</strong> CAT III 600V Minimum fuer Hausinstallation. <strong>True-RMS</strong> bei verzerrten Signalen. Spannung: Parallel. Strom: Reihe (Kreis oeffnen!). Widerstand: Spannungsfrei + parallel.</p><p><strong>Erstpruefung VDE 0100-610:</strong> 1. Sichtpruefung -> 2. PE-Durchgang -> 3. Isolationsmessung (500VDC, min. 0,5 MOhm) -> 4. FI-Test -> 5. Schleifenimpedanz -> 6. Spannungsmessung</p>',aderfarben:false,formeln:[{label:'Spannung',f:'Voltmeter PARALLEL',erkl:'Sehr hoher Innenwiderstand ~MOhm'},{label:'Strom',f:'Amperemeter IN REIHE (Kreis oeffnen!)',erkl:'Sehr kleiner Innenwiderstand'},{label:'Widerstand',f:'SPANNUNGSFREI + parallel',erkl:'Geraet legt eigene Messspannung an'},{label:'Mindest-Iso.',f:'R_iso >= 0,5 MOhm (bei U_N <= 500V)',erkl:'Besser > 1MOhm'}],merksatz:'Spannung=Parallel. Strom=Reihe. Widerstand=Spannungsfrei. Erstimmer hoechsten Bereich! Iso-Messung: ALLE Geraete abklemmen!',praxistipps:['Iso-Messung: Elektronik abklemmen (500VDC kann Geraete zerstoeren).','Pruefprotokoll Pflicht! Unterschreiben, Kopie dem Kunden.'],fehler:[{t:'Amperemeter parallel',text:'Fast 0 Ohm -> Kurzschluss! Immer in Reihe!'},{t:'Iso-Messung mit Geraeten',text:'Elektronik wird beschaedigt. Alle Verbraucher abklemmen!'}],normen:[{nr:'DIN VDE 0100-610',text:'Erstpruefung elektrischer Anlagen.'}],aufgaben:[{nr:'1',text:'Pruefschritte neue Wohnungsinstallation?',lsg:'1. Sichtpruefung\n2. PE-Durchgang jede Steckdose\n3. Isolationsmessung 500VDC, min. 0,5 MOhm\n4. FI-Test Ausloesung <=30mA, t<300ms\n5. Schleifenimpedanz\n6. Spannungsmessung 230V\n7. Protokoll unterschreiben'}]},
+{id:'lj2_leitungsber',jahr:'2',typ:'bs',fach:'Elektrotechnik',farbe:'#fbbf24',name:'Leitungsberechnung & Querschnitt',lead:'Falscher Querschnitt ist eine der haeufigsten Brandursachen.',erklaerung:'<p><strong>3 Kriterien (alle muessen erfuellt sein):</strong></p><p>1. <strong>Strombelastbarkeit:</strong> Dauerstrom <= I_zul der Leitung.</p><p>2. <strong>Spannungsfall:</strong> Max. 3% Beleuchtung, 5% andere Verbraucher.</p><p>3. <strong>Kurzschlussschutz:</strong> LSS muss schnell genug ausloesen.</p>',aderfarben:false,formeln:[{label:'Spannungsfall einphasig',f:'DeltaU = 2 * rho * l * I / A',erkl:'rho_Cu=0,0178, l in m, A in mm2'},{label:'DeltaU%',f:'DeltaU% = DeltaU / U_nenn * 100',erkl:'Max. 3% Licht, 5% Kraft'},{label:'Mindestquerschnitt',f:'A >= 2 * rho * l * I / DeltaU_max',erkl:'Umgestellt nach A'}],merksatz:'3 Kriterien: Waerme, Spannungsfall, Kurzschluss. Groesster Querschnitt gewinnt. Faustregel: 1,5mm2->16A, 2,5mm2->20A, 4mm2->25A, 6mm2->32A.',praxistipps:['Bei langen Leitungen (>20m) immer Spannungsfall berechnen!'],fehler:[{t:'Nur Strombelastbarkeit pruefen',text:'50m 1,5mm2 bei 10A schon 5% Spannungsfall!'}],normen:[{nr:'DIN VDE 0100-520',text:'Leitungsverlegung. Strombelastbarkeitstabellen.'}],aufgaben:[{nr:'1',text:'I=12A, l=30m, Cu einphasig. Querschnitt fuer DeltaU<=3%?',lsg:'DeltaU_max=0,03*230=6,9V\nA>=2*0,0178*30*12/6,9=12,816/6,9=1,857mm2\n-> Naechster genormter Querschnitt: 2,5mm2'}]},
+{id:'lj3_motoren',jahr:'3',typ:'bs',fach:'Antriebstechnik',farbe:'#c084fc',name:'Drehstrom-Asynchronmotor',lead:'Der meistverwendete Motor der Welt.',erklaerung:'<p>Rotierendes Magnetfeld -> Ströme im Rotor -> Drehmoment. Rotor dreht etwas langsamer (Schlupf s).<br><strong>Stern-Dreieck-Anlauf:</strong> Reduziert Anlaufstrom auf 1/3. Bei Motoren > 4kW empfohlen.<br><strong>IE-Effizienzklassen:</strong> Ab 2023: Motoren > 0,75kW muessen min. IE3.</p>',aderfarben:false,formeln:[{label:'Synchrondrehzahl',f:'n_s = 60 * f / p   (min-1)',erkl:'f=50Hz, p=Polpaarzahl'},{label:'Schlupf',f:'s = (n_s - n) / n_s',erkl:'Typisch 2-5%'},{label:'Anlaufstrom Direkt',f:'I_A = 5-7 * I_N',erkl:'Deshalb Stern-Dreieck!'},{label:'Stern-Dreieck Anlauf',f:'I_A(YD) = I_A(direkt) / 3',erkl:''}],merksatz:'2-polig=3000U/min. 4-polig=1500U/min. 6-polig=1000U/min. Drehrichtung: 2 Aussenleiter tauschen. IE3 Pflicht ab 0,75kW.',praxistipps:['Typenschild lesen: U, I_N, P, n, cosfi, IP, Isolationsklasse.','Motorschutzschalter auf I_N + 10% einstellen.'],fehler:[{t:'Kein Motorschutzschalter',text:'LSS schuetzt nur Kurzschluss. Motorschutzschalter schuetzt thermisch -> ohne: Wicklungsbrand!'},{t:'Stern-Dreieck zu schnell',text:'Zu schnelle Umschaltung -> Spannungsspitze. Min. 2-3s warten!'}],normen:[{nr:'DIN EN 60034',text:'Drehende Maschinen.'}],aufgaben:[{nr:'1',text:'4-polig, f=50Hz, s=4%. n_s und n?',lsg:'p=4/2=2\nn_s=60*50/2=1500 min-1\nn=1500*(1-0,04)=1440 min-1'},{nr:'2',text:'I_A=42A Direktanlauf. I_A Stern-Dreieck?',lsg:'I_A(YD)=42/3=14A -> nur 1/3 des Direktanlauf-Stroms!'}]},
+{id:'lj3_sps',jahr:'3',typ:'bs',fach:'Steuerungstechnik',farbe:'#2dd4bf',name:'SPS — Speicherprogrammierbare Steuerung',lead:'Die SPS hat Schuetzschaltungen fast vollstaendig abgeloest.',erklaerung:'<p><strong>SPS-Zyklus:</strong> 1. Eingaenge einlesen -> 2. Programm ausfuehren -> 3. Ausgaenge setzen -> wiederholen. Zykluszeit: 1-20ms.</p><p><strong>Programmiersprachen (IEC 61131-3):</strong> KOP (wie Schaltplan, ideal fuer Elektriker!), FUP (Logikgatter), ST (Hochsprache).</p><p>Siemens S7-1200/1500 + TIA Portal = Marktfuehrer DE.</p>',aderfarben:false,formeln:[],merksatz:'SPS-Zyklus: Eingaenge->Programm->Ausgaenge. KOP fuer Elektriker am einfachsten. SPS auf STOP bevor du verdrahtest!',praxistipps:['KOP zuerst: Du denkst schon in Schaltplaenen.','STOP vor Verdrahtung: Sonst faehrt Maschine!'],fehler:[{t:'Eingang direkt an 230V',text:'SPS-Eingaenge nur 24VDC! Relais vorschalten.'},{t:'SPS im RUN verdrahten',text:'Ausgaenge koennen schalten -> Maschinenteile bewegen sich!'}],normen:[{nr:'IEC 61131-3',text:'SPS-Programmiersprachen: KOP, FUP, AWL, ST, AS.'}],aufgaben:[{nr:'1',text:'Erklaere den SPS-Zyklus.',lsg:'1. Prozessabbild Eingaenge einlesen\n2. Programm ausfuehren (Ausgangswerte berechnen)\n3. Ausgaenge setzen\n-> Wiederholen (1-20ms)\nWichtig: Eingaenge aendern sich nicht WAEHREND der Bearbeitung.'}]},
+{id:'lj3_knx',jahr:'3',typ:'praxis',fach:'Gebaeude-automation',farbe:'#fb923c',name:'KNX — Smart Building Standard',lead:'Weltweiter Standard fuer intelligente Gebaeudesteuerung.',erklaerung:'<p>Bus-Kabel (gruen, Twisted Pair) verbindet alle Geraete. Jedes Geraet hat physische Adresse. <strong>Gruppenadresse</strong> = Taster sendet -> Schaltaktor reagiert. Topologie: Linie (max. 64 TN) -> Bereich -> Backbone. <strong>ETS</strong> = Programmiersoftware.</p>',aderfarben:false,formeln:[{label:'Bus-Spannung',f:'29VDC SELV (10-32VDC zulaessig)',erkl:'Sicherheitskleinspannung'},{label:'Max. Linienlaenge',f:'1000m (Twisted Pair)',erkl:'Ohne Linienverstaerker'}],merksatz:'KNX = Bus, kein Stern. Gruppenadresse = Kommunikationskanal. ETS = Programmiertool. Polaritaet beachten!',praxistipps:['KNX-Kabel: gruen, Rot/Schwarz=Daten.','KNX-Zertifikat (Basic/Advanced) macht dich marktwertvoll.'],fehler:[{t:'Bus-Polaritaet vertauscht',text:'KNX polaritaetsabhaengig. Rot(+) und Schwarz(-) nicht tauschen!'},{t:'>64 Teilnehmer',text:'Ohne Kopplung: Kommunikationsfehler. Linienkoppler einsetzen!'}],normen:[{nr:'DIN EN 50090',text:'HBES. KNX-Normenreihe.'}],aufgaben:[{nr:'1',text:'Unterschied konventionell vs. KNX?',lsg:'Konventionell: Taster->Kabel->Lampe. Mehrere Schaltstellen = Kreuzschaltung = viele Kabel.\nKNX: Telegramm->Bus->Schaltaktor. Beliebig viele Schaltstellen ohne Zusatzkabel. Alles programmierbar.'}]},
+{id:'lj3_emobilitaet',jahr:'3',typ:'praxis',fach:'E-Mobilitaet',farbe:'#34d399',name:'E-Mobilitaet & Wallbox-Installation',lead:'Jeder Elektriker wird Wallboxen installieren. Das Wachstumsfeld der naechsten Jahre.',erklaerung:'<p><strong>Lademodi:</strong> Mode 1: Schuko 2,3kW. Mode 2: Schuko+ICCB bis 3,7kW. Mode 3: Wallbox 11-22kW (Standard!). Mode 4: DC-Schnelllader bis 350kW.</p><p><strong>Netzanmeldung:</strong> >3,7kW beim Netzbetreiber anmelden (VDE-AR-N 4100). Pflicht!</p>',aderfarben:false,formeln:[{label:'Ladeleistung',f:'P = sqrt(3) * U_L * I',erkl:'11kW: 1,732*400*16=11.085W'},{label:'Ladezeit',f:'t = C_Batterie / P_laden',erkl:'75kWh / 11kW = 6,8h Vollladung'},{label:'Querschnitt 11kW',f:'I=16A -> min. 2,5mm2, empfohlen 4-6mm2',erkl:''},{label:'Querschnitt 22kW',f:'I=32A -> min. 6mm2, oft 10mm2',erkl:''}],merksatz:'11kW=16A Drehstrom=4mm2. FI Typ B (oder Typ A wenn WB internen DC-Schutz hat). IMMER >3,7kW anmelden!',praxistipps:['Lastmanagement bei mehreren Wallboxen.','KfW/BAFA Foerderung dem Kunden nennen.'],fehler:[{t:'FI Typ AC fuer Wallbox',text:'WB erzeugt DC-Fehlerstroeme -> Typ B oder Typ A wenn WB internen DC-Schutz hat.'},{t:'Keine Anmeldung',text:'>3,7kW anmelden! Ohne Anmeldung -> Versicherungsschutz gefaehrdet.'}],normen:[{nr:'IEC 61851',text:'Konduktive Ladesysteme. Lademodi 1-4.'},{nr:'VDE-AR-N 4100',text:'Anmeldung Wallboxen beim Netzbetreiber.'}],aufgaben:[{nr:'1',text:'Wallbox 11kW, 25m. Querschnitt?',lsg:'I=16A. DeltaU_max=5%*400=20V\nA>=sqrt(3)*0,0178*25*16/20=0,616mm2\nStrombelastbarkeit: 16A->2,5mm2 genuegt\nEmpfehlung: 5x4mm2 fuer Reserve'},{nr:'2',text:'Warum >3,7kW anmelden?',lsg:'11-22kW belasten Ortsnetz erheblich. Netzbetreiber muss Kapazitaet pruefen. Versicherungsschutz.'}]}
+];
+var lF='all',lY='all',lActive=null;
+function setF(f,btn){
+  lF=f;
+  document.querySelectorAll('[data-typ]').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  renderLernList();
+}
+function setY(y,btn){
+  lY=y;
+  document.querySelectorAll('[data-jahr]').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  renderLernList();
+}
+function renderLernList(){
+  var list=document.getElementById('lern-list');if(!list)return;
+  var filtered=THEMEN.filter(function(t){
+    if(lF!=='all'&&t.typ!==lF)return false;
+    if(lY!=='all'&&t.jahr!==lY)return false;
+    return true;
+  });
+  var groups={};
+  filtered.forEach(function(t){
+    var k=t.jahr==='0'?'Vor der Ausbildung':t.jahr==='1'?'1. Lehrjahr':t.jahr==='2'?'2. Lehrjahr':'3. Lehrjahr';
+    if(!groups[k])groups[k]=[];groups[k].push(t);
+  });
+  var html='';
+  Object.keys(groups).forEach(function(label){
+    var items=groups[label];
+    html+='<div class="lg-head">'+label+'<span class="lg-cnt">'+items.length+'</span></div>';
+    items.forEach(function(t){
+      var isDone=state.lernDone[t.id];
+      html+='<button class="lt-btn'+(lActive===t.id?' active':'')+'" onclick="openThema(\''+t.id+'\')"><div class="lt-dot" style="background:'+t.farbe+'"></div><div class="lt-info"><div class="lt-name">'+t.name+'</div><div class="lt-meta">'+t.fach+' &middot; '+(t.typ==='bs'?'BS':t.typ==='praxis'?'Praxis':'Voraus')+'</div></div>'+(isDone?'<span class="lt-done">&#10003;</span>':'')+'</button>';
+    });
+  });
+  if(!html)html='<div style="padding:16px;font-size:11px;color:var(--muted);text-align:center">Kein Thema fuer diesen Filter.</div>';
+  list.innerHTML=html;
+  updateLernProg();
+}
+function openThema(id){
+  lActive=id;
+  var t=THEMEN.filter(function(x){return x.id===id;})[0];
+  if(!t)return;
+  renderLernList();
+  renderThema(t);
+}
+function renderThema(t){
+  var isDone=state.lernDone[t.id];
+  var jLbl=t.jahr==='0'?'Vor der Ausbildung':t.jahr==='1'?'1. Lehrjahr':t.jahr==='2'?'2. Lehrjahr':'3. Lehrjahr';
+  var tLbl=t.typ==='bs'?'Berufsschule':t.typ==='praxis'?'Praxis':'Vorauslernen';
+  var tCls=t.typ==='bs'?'b-purple':t.typ==='praxis'?'b-green':'b-orange';
+  var h='<div class="lernseite">';
+  h+='<div class="ls-crumb">'+jLbl+' <span>&#8250;</span> '+t.fach+' <span>&#8250;</span> '+t.name+'</div>';
+  h+='<div class="ls-badges"><span class="badge b-blue">'+jLbl+'</span><span class="badge '+tCls+'">'+tLbl+'</span>'+(isDone?'<span class="badge b-green">&#10003; Gelernt</span>':'')+'</div>';
+  h+='<div class="ls-title">'+t.name+'</div>';
+  h+='<div class="ls-lead">'+t.lead+'</div>';
+  if(t.erklaerung){h+='<div class="sec"><div class="sec-label">Erklaerung</div><div class="ftext">'+t.erklaerung+'</div></div>';}
+  if(t.aderfarben){
+    h+='<div class="sec"><div class="sec-label">Aderfarben EU (ab 2004)</div>';
+    h+='<table class="ader-tbl"><thead><tr><th>Ader</th><th>Farbe</th><th>Funktion</th><th>Sicher?</th></tr></thead><tbody>';
+    h+='<tr><td>L1</td><td><span class="a-swatch"><span class="a-dot" style="background:#7c3f00"></span>Braun</span></td><td>Aussenleiter Phase 1</td><td style="color:var(--red)">NIEMALS</td></tr>';
+    h+='<tr><td>L2</td><td><span class="a-swatch"><span class="a-dot" style="background:#111;border-color:#555"></span>Schwarz</span></td><td>Aussenleiter Phase 2</td><td style="color:var(--red)">NIEMALS</td></tr>';
+    h+='<tr><td>L3</td><td><span class="a-swatch"><span class="a-dot" style="background:#888"></span>Grau</span></td><td>Aussenleiter Phase 3</td><td style="color:var(--red)">NIEMALS</td></tr>';
+    h+='<tr><td>N</td><td><span class="a-swatch"><span class="a-dot" style="background:#003db4"></span>Blau</span></td><td>Neutralleiter</td><td style="color:var(--amber)">Nur spannungsfrei</td></tr>';
+    h+='<tr><td>PE</td><td><span class="a-swatch"><span class="a-dot" style="background:linear-gradient(135deg,#1a7a1a 50%,#e6b800 50%)"></span>Gruen-Gelb</span></td><td>Schutzleiter</td><td style="color:var(--green)">Normal sicher</td></tr>';
+    h+='</tbody></table>';
+    h+='<div style="margin-top:12px;font-size:11px;color:var(--muted)"><strong style="color:var(--amber)">Altinstallation (vor 2004):</strong> Rot=L, Schwarz=N, Gruen=PE. IMMER nachmessen!</div>';
+    h+='</div>';
+  }
+  if(t.formeln&&t.formeln.length){
+    h+='<div class="sec"><div class="sec-label">Formeln</div><div class="formel-grid">';
+    t.formeln.forEach(function(f){h+='<div class="formel-item"><div class="formel-lbl">'+f.label+'</div><div class="formel-f">'+f.f+'</div>'+(f.erkl?'<div class="formel-e">'+f.erkl+'</div>':'')+'</div>';});
+    h+='</div></div>';
+  }
+  if(t.merksatz){h+='<div class="sec"><div class="sec-label">Merksatz</div><div class="merksatz"><div class="merk-head">MERKSATZ</div><div class="merk-text">'+t.merksatz+'</div></div></div>';}
+  if(t.praxistipps&&t.praxistipps.length){
+    h+='<div class="sec"><div class="sec-label">Praxistipps</div>';
+    t.praxistipps.forEach(function(p){h+='<div class="praxistipp"><div class="praxis-head">PRAXIS</div><div class="praxis-text">'+p+'</div></div>';});
+    h+='</div>';
+  }
+  if(t.fehler&&t.fehler.length){
+    h+='<div class="sec"><div class="sec-label">Haeufige Fehler</div>';
+    t.fehler.forEach(function(f){h+='<div class="fehler-box"><div class="fehler-head">FEHLER: '+f.t+'</div><div class="fehler-text">'+f.text+'</div></div>';});
+    h+='</div>';
+  }
+  if(t.normen&&t.normen.length){
+    h+='<div class="sec"><div class="sec-label">Normen</div>';
+    t.normen.forEach(function(n){h+='<div class="norm-box"><div class="norm-nr">'+n.nr+'</div><div class="norm-text">'+n.text+'</div></div>';});
+    h+='</div>';
+  }
+  if(t.aufgaben&&t.aufgaben.length){
+    h+='<div class="sec"><div class="sec-label">Aufgaben</div>';
+    t.aufgaben.forEach(function(a,i){
+      var uid=t.id+'_'+i;
+      h+='<button class="aufg-toggle" id="atog_'+uid+'" onclick="togAufg(\''+uid+'\')">';
+      h+='<span>Aufgabe '+a.nr+'</span><span class="aufg-chevron">&#8250;</span></button>';
+      h+='<div class="aufg-body" id="abody_'+uid+'">';
+      h+='<div class="aufgabe"><div class="aufg-nr">AUFGABE '+a.nr+'</div>';
+      h+='<div class="aufg-text">'+a.text+'</div>';
+      h+='<button class="lsg-btn" onclick="togLsg(\'lsg_'+uid+'\')">Loesung anzeigen</button>';
+      h+='<div class="lsg-box" id="lsg_'+uid+'">'+a.lsg+'</div></div></div>';
+    });
+    h+='</div>';
+  }
+  h+='<div class="done-bar">';
+  h+='<button class="done-btn '+(isDone?'id':'nd')+'" onclick="togDone(\''+t.id+'\')">'+(isDone?'&#10003; Als gelernt markiert':'Gelernt')+'</button>';
+  h+='<button class="next-btn" onclick="nextThema()">Naechstes &#8594;</button>';
+  h+='</div></div>';
+  var la=document.getElementById('lern-area');if(la){la.innerHTML=h;la.scrollTop=0;}
+}
+function togAufg(uid){
+  var btn=document.getElementById('atog_'+uid),body=document.getElementById('abody_'+uid);
+  if(!btn||!body)return;
+  var op=body.classList.toggle('open');btn.classList.toggle('open',op);
+}
+function togLsg(id){var e=document.getElementById(id);if(e)e.classList.toggle('show');}
+function togDone(id){
+  state.lernDone[id]=!state.lernDone[id];
+  S.set('lernDone',state.lernDone);
+  var t=THEMEN.filter(function(x){return x.id===id;})[0];
+  if(t)renderThema(t);
+  renderLernList();
+}
+function nextThema(){
+  var idx=THEMEN.findIndex(function(t){return t.id===lActive;});
+  if(idx<THEMEN.length-1)openThema(THEMEN[idx+1].id);
+}
+// MEHR MENU
+function openMehr(){document.getElementById('mehr-menu').style.display='block';}
+function closeMehr(){document.getElementById('mehr-menu').style.display='none';}
+function navMehr(page){closeMehr();nav(page);}
+// INIT — load from Supabase first, then render
+loadFromSupabase(function() {
+  // Reload state from localStorage after sync
+  state.streak = S.get('streak', 0);
+  state.kranktage = S.get('kranktage', 0);
+  state.lastGym = S.get('lastGym', '');
+  state.gymDays = S.get('gymDays', []);
+  state.kranDays = S.get('kranDays', []);
+  state.money = S.get('money', 1000);
+  state.etf = S.get('etf', 0);
+  state.tages = S.get('tages', 0);
+  state.extraInv = S.get('extraInv', []);
+  state.saved = S.get('saved', 0);
+  state.incomes = S.get('incomes', []);
+  state.expenses = S.get('expenses', []);
+  state.sparplan = S.get('sparplan', []);
+  state.protein = S.get('p_'+today, 0);
+  state.kcal = S.get('k_'+today, 0);
+  state.carbs = S.get('c_'+today, 0);
+  state.fat = S.get('f_'+today, 0);
+  state.water = S.get('w_'+today, 0);
+  state.sleepQ = S.get('sq_'+today, '');
+  state.sleepLog = S.get('sleepLog', []);
+  state.tasks = S.get('tasks', state.tasks);
+  state.prs = S.get('prs', []);
+  state.ideas = S.get('ideas', []);
+  state.noten = S.get('noten', []);
+  state.skinLog = S.get('skinLog', []);
+  state.journals = S.get('journals', []);
+  state.weekReviews = S.get('wr', []);
+  state.reiseLog = S.get('reiseLog', []);
+  state.ruStreak = S.get('ruStreak', 0);
+  state.zhSessions = S.get('zhSessions', 0);
+  state.books = S.get('books', 0);
+  state.courses = S.get('courses', 0);
+  state.bizUmsatz = S.get('bizUmsatz', 0);
+  state.lernDone = S.get('lernDone', {});
+  state.weight = S.get('weight', 75);
+  state.kfa = S.get('kfa', '');
+  renderDash();
+  renderTasks();
+});
+
+// ─── KALENDER ───────────────────────────────────
+var kalYear=new Date().getFullYear(), kalMonth=new Date().getMonth();
+var kalSelectedDate=null;
+var kalDetailDate=null;
+
+function kalPrev(){kalMonth--;if(kalMonth<0){kalMonth=11;kalYear--;}renderKal();}
+function kalNext(){kalMonth++;if(kalMonth>11){kalMonth=0;kalYear++;}renderKal();}
+function kalToday(){kalYear=new Date().getFullYear();kalMonth=new Date().getMonth();renderKal();}
+
+function kalDateKey(y,m,d){return y+'-'+(m<9?'0':'')+(m+1)+'-'+(d<10?'0':'')+d;}
+function kalCatClass(cat){return 'kev-'+(cat||'sonstiges');}
+var katEmoji={gym:'💪',health:'🩺',business:'▼',lernen:'⚡',persoenlich:'☆',reise:'✈',sonstiges:'■'};
+
+function renderKal(){
+  var months=['Januar','Februar','Maerz','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+  var lbl=document.getElementById('kal-month-lbl');
+  if(lbl)lbl.textContent=months[kalMonth]+' '+kalYear;
+
+  var grid=document.getElementById('kal-grid');if(!grid)return;
+
+  var firstDay=new Date(kalYear,kalMonth,1).getDay();
+  var daysInMonth=new Date(kalYear,kalMonth+1,0).getDate();
+  var daysInPrev=new Date(kalYear,kalMonth,0).getDate();
+  // Monday=0
+  var startOffset=(firstDay+6)%7;
+
+  var today=new Date();
+  var todayKey=kalDateKey(today.getFullYear(),today.getMonth(),today.getDate());
+  var events=S.get('kalEvents',[]);
+
+  var cells='';
+  var totalCells=Math.ceil((startOffset+daysInMonth)/7)*7;
+
+  for(var i=0;i<totalCells;i++){
+    var day,month,year,otherMonth=false;
+    if(i<startOffset){day=daysInPrev-startOffset+i+1;month=kalMonth-1;year=kalYear;if(month<0){month=11;year--;}otherMonth=true;}
+    else if(i>=startOffset+daysInMonth){day=i-startOffset-daysInMonth+1;month=kalMonth+1;year=kalYear;if(month>11){month=0;year++;}otherMonth=true;}
+    else{day=i-startOffset+1;month=kalMonth;year=kalYear;}
+
+    var dateKey=kalDateKey(year,month,day);
+    var isToday=dateKey===todayKey;
+    var isSelected=dateKey===kalSelectedDate;
+    var dayEvents=events.filter(function(e){return e.date===dateKey;});
+
+    var evHtml='';
+    dayEvents.slice(0,3).forEach(function(e){
+      evHtml+='<div class="kal-event-dot '+kalCatClass(e.cat)+'">'+(e.time?e.time+' ':'')+e.title+'</div>';
+    });
+    if(dayEvents.length>3)evHtml+='<div style="font-size:9px;color:var(--muted)">+' +(dayEvents.length-3)+' mehr</div>';
+
+    // Weekend coloring
+    var dow=(i%7);
+    var dayNumColor=dow>=5?'color:'+(dow===6?'var(--red)':'var(--amber)'):'';
+
+    cells+='<div class="kal-cell'+(isToday?' today':'')+(otherMonth?' other-month':'')+(isSelected?' selected':'')+'" onclick="kalSelectDay(\''+dateKey+'\')">';
+    cells+='<div class="kal-day-num" style="'+dayNumColor+'">'+day+'</div>';
+    cells+=evHtml;
+    cells+='</div>';
+  }
+  grid.innerHTML=cells;
+  renderUpcoming();
+}
+
+function kalSelectDay(dateKey){
+  kalSelectedDate=dateKey;
+  renderKal();
+  // Show detail
+  var detail=document.getElementById('kal-detail');
+  var detailDate=document.getElementById('kal-detail-date');
+  var detailEvents=document.getElementById('kal-detail-events');
+  if(!detail)return;
+  kalDetailDate=dateKey;
+  var parts=dateKey.split('-');
+  var d=new Date(parseInt(parts[0]),parseInt(parts[1])-1,parseInt(parts[2]));
+  var days=['So','Mo','Di','Mi','Do','Fr','Sa'];
+  var months=['Jan','Feb','Mar','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+  if(detailDate)detailDate.textContent=days[d.getDay()]+', '+parts[2]+'. '+months[d.getMonth()]+' '+parts[0];
+  var events=S.get('kalEvents',[]);
+  var dayEvents=events.filter(function(e){return e.date===dateKey;}).sort(function(a,b){return (a.time||'').localeCompare(b.time||'');});
+  if(detailEvents){
+    if(!dayEvents.length){detailEvents.innerHTML='<div style="color:var(--muted);font-size:12px;padding:4px 0">Keine Events an diesem Tag.</div>';}
+    else{detailEvents.innerHTML=dayEvents.map(function(ev,idx){
+      return '<div style="display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid var(--border)">'
+        +'<div class="kal-event-dot '+kalCatClass(ev.cat)+'" style="flex-shrink:0;margin-top:2px;font-size:11px;padding:2px 6px">'+(katEmoji[ev.cat]||'■')+'</div>'
+        +'<div style="flex:1"><div style="font-size:13px;font-weight:500">'+ev.title+'</div>'
+        +(ev.time?'<div style="font-size:10px;color:var(--muted);font-family:JetBrains Mono,monospace">'+ev.time+'</div>':'')
+        +(ev.note?'<div style="font-size:11px;color:var(--muted);margin-top:3px">'+ev.note+'</div>':'')
+        +'</div>'
+        +'<button onclick="kalDeleteEvent('+idx+',\''+dateKey+'\')" style="font-size:10px;color:var(--red);background:none;border:none;cursor:pointer;flex-shrink:0;padding:2px 5px">&#10005;</button>'
+        +'</div>';
+    }).join('');}
+  }
+  detail.style.display='block';
+}
+
+function kalAddFromDetail(){
+  if(kalDetailDate){
+    var inp=document.getElementById('kev-date');
+    if(inp)inp.value=kalDetailDate;
+  }
+  openModal('m-kalevent');
+}
+
+function saveKalEvent(){
+  var date=document.getElementById('kev-date').value;
+  var time=document.getElementById('kev-time').value;
+  var title=document.getElementById('kev-title').value.trim();
+  var cat=document.getElementById('kev-cat').value;
+  var note=document.getElementById('kev-note').value.trim();
+  if(!date||!title)return;
+  var events=S.get('kalEvents',[]);
+  events.push({date:date,time:time,title:title,cat:cat,note:note});
+  events.sort(function(a,b){return a.date.localeCompare(b.date)||(a.time||'').localeCompare(b.time||'');});
+  S.set('kalEvents',events);
+  closeModal('m-kalevent');
+  ['kev-date','kev-time','kev-title','kev-note'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
+  renderKal();
+  if(kalDetailDate)kalSelectDay(kalDetailDate);
+}
+
+function kalDeleteEvent(idx,dateKey){
+  var events=S.get('kalEvents',[]);
+  var dayEvents=events.filter(function(e){return e.date===dateKey;});
+  var toDelete=dayEvents[idx];
+  if(!toDelete)return;
+  var newEvents=events.filter(function(e){return e!==toDelete;});
+  // Actually filter by identity won't work - use index
+  var removed=false;
+  newEvents=events.filter(function(e){
+    if(!removed&&e.date===toDelete.date&&e.title===toDelete.title&&e.time===toDelete.time){removed=true;return false;}
+    return true;
+  });
+  S.set('kalEvents',newEvents);
+  renderKal();
+  kalSelectDay(dateKey);
+}
+
+function renderUpcoming(){
+  var el=document.getElementById('kal-upcoming');if(!el)return;
+  var today=new Date();
+  today.setHours(0,0,0,0);
+  var events=S.get('kalEvents',[]);
+  var upcoming=events.filter(function(e){
+    var d=new Date(e.date);return d>=today;
+  }).slice(0,6);
+  if(!upcoming.length){el.innerHTML='<div style="font-size:12px;color:var(--muted)">Keine anstehenden Termine.</div>';return;}
+  var months=['Jan','Feb','Mar','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+  el.innerHTML=upcoming.map(function(ev){
+    var parts=ev.date.split('-');
+    var d=new Date(parseInt(parts[0]),parseInt(parts[1])-1,parseInt(parts[2]));
+    var dateStr=parts[2]+'. '+months[d.getMonth()];
+    var catColors={gym:'var(--green)',health:'var(--red)',business:'var(--accent)',lernen:'var(--amber)',persoenlich:'var(--purple)',reise:'var(--teal)',sonstiges:'var(--muted)'};
+    return '<div class="upcoming-item">'
+      +'<div class="upcoming-date">'+dateStr+'</div>'
+      +'<div class="upcoming-dot" style="background:'+(catColors[ev.cat]||'var(--muted)')+'"></div>'
+      +'<div class="upcoming-info"><div class="upcoming-title">'+ev.title+'</div>'
+      +(ev.time?'<div class="upcoming-sub">'+ev.time+(ev.note?' · '+ev.note:'')+'</div>':'')
+      +'</div></div>';
+  }).join('');
+}
+// ─── END KALENDER ───────────────────────────────
+
+// ─── TAGES-VERLAUF ───────────────────────────────
+var vlFilter = 7;
+
+function saveDayToVerlauf() {
+  var records = S.get('verlauf', []);
+  var dateKey = today;
+  // Remove existing entry for today if exists
+  records = records.filter(function(r) { return r.date !== dateKey; });
+  var score = calcScore();
+  records.push({
+    date: dateKey,
+    protein: state.protein,
+    kcal: state.kcal,
+    carbs: state.carbs,
+    fat: state.fat,
+    water: state.water,
+    gym: state.gymDays.indexOf(dateKey) > -1,
+    krank: state.kranDays.indexOf(dateKey) > -1,
+    schlafH: (function() {
+      var last = state.sleepLog && state.sleepLog.length ? state.sleepLog[state.sleepLog.length-1] : null;
+      return last ? last.hours : 0;
+    })(),
+    score: score,
+    streak: state.streak,
+    weight: state.weight,
+    focus: S.get('focus_' + dateKey, '')
+  });
+  // Keep max 365 days
+  records.sort(function(a,b){return a.date.localeCompare(b.date);});
+  if(records.length > 365) records = records.slice(-365);
+  S.set('verlauf', records);
+}
+
+function saveTodayManual() {
+  saveDayToVerlauf();
+  renderVerlauf();
+  // Show feedback
+  var btn = event.target;
+  var orig = btn.textContent;
+  btn.textContent = '✓ Gespeichert!';
+  btn.style.color = 'var(--green)';
+  setTimeout(function() { btn.textContent = orig; btn.style.color = ''; }, 2000);
+}
+
+function setVlFilter(days, btn) {
+  vlFilter = days;
+  document.querySelectorAll('#page-verlauf .ftab').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  renderVerlauf();
+}
+
+function renderVerlauf() {
+  var records = S.get('verlauf', []);
+  
+  // Auto-save today if not already saved
+  var todayExists = records.some(function(r) { return r.date === today; });
+  if(!todayExists && (state.protein > 0 || state.gymDays.indexOf(today) > -1)) {
+    saveDayToVerlauf();
+    records = S.get('verlauf', []);
+  }
+
+  // Filter
+  var filtered = records;
+  if(vlFilter > 0) {
+    var cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - vlFilter);
+    var cutoffStr = cutoff.toDateString();
+    filtered = records.filter(function(r) {
+      return new Date(r.date) >= new Date(cutoffStr);
+    });
+  }
+  filtered = filtered.slice().reverse(); // newest first
+
+  // Stats
+  var total = records.length;
+  var avgP = total ? Math.round(records.reduce(function(a,r){return a+r.protein;},0)/total) : 0;
+  var avgS = total ? Math.round(records.reduce(function(a,r){return a+r.score;},0)/total) : 0;
+  var te = document.getElementById('vl-total'); if(te) te.textContent = total;
+  var pe = document.getElementById('vl-avg-p'); if(pe) pe.textContent = avgP+'g';
+  var se = document.getElementById('vl-avg-s'); if(se) se.textContent = avgS;
+
+  // List
+  var el = document.getElementById('verlauf-list');
+  if(!el) return;
+  if(!filtered.length) {
+    el.innerHTML = '<div class="card" style="text-align:center;padding:28px;color:var(--muted);font-size:13px">Noch keine Daten. Tipp auf "Heute speichern" oder nutze die App den ganzen Tag.</div>';
+    return;
+  }
+
+  var days = ['So','Mo','Di','Mi','Do','Fr','Sa'];
+  var months = ['Jan','Feb','Mar','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+
+  el.innerHTML = filtered.map(function(r) {
+    var d = new Date(r.date);
+    var dateStr = days[d.getDay()] + ', ' + d.getDate() + '. ' + months[d.getMonth()];
+    var isToday = r.date === today;
+    
+    var scoreColor = r.score >= 80 ? 'var(--green)' : r.score >= 60 ? 'var(--amber)' : 'var(--red)';
+    var gymBadge = r.krank 
+      ? '<span class="tag t-red">Krank</span>'
+      : r.gym 
+        ? '<span class="tag t-green">Gym ✓</span>'
+        : '<span class="tag" style="background:var(--bg4);color:var(--muted)">Kein Gym</span>';
+
+    var proteinPct = Math.min(100, Math.round(r.protein/150*100));
+    var proteinColor = proteinPct >= 90 ? 'var(--green)' : proteinPct >= 60 ? 'var(--amber)' : 'var(--red)';
+    var kcalPct = Math.min(100, Math.round(r.kcal/2600*100));
+    var waterPct = Math.min(100, Math.round(r.water/8*100));
+
+    return '<div class="card" style="margin-bottom:10px'+(isToday?';border-color:rgba(74,158,255,.3)':'')+'">'
+      + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">'
+      + '<div>'
+      + '<div style="font-size:13px;font-weight:600">' + dateStr + (isToday?' <span style="font-size:9px;color:var(--accent);font-family:JetBrains Mono,monospace">HEUTE</span>':'') + '</div>'
+      + (r.focus ? '<div style="font-size:10px;color:var(--muted);margin-top:2px;font-style:italic">"'+r.focus+'"</div>' : '')
+      + '</div>'
+      + '<div style="display:flex;align-items:center;gap:8px">'
+      + gymBadge
+      + '<div style="font-size:20px;font-weight:700;font-family:JetBrains Mono,monospace;color:'+scoreColor+'">'+r.score+'</div>'
+      + '</div></div>'
+      // Macros bars
+      + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">'
+      // Protein
+      + '<div><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span style="color:var(--text2)">Protein</span><span style="font-family:JetBrains Mono,monospace;font-size:10px;color:'+proteinColor+'">'+r.protein+'g</span></div>'
+      + '<div class="prog-bar"><div class="prog-fill pf-blue" style="width:'+proteinPct+'%;background:'+proteinColor+'"></div></div></div>'
+      // Kalorien
+      + '<div><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span style="color:var(--text2)">Kalorien</span><span style="font-family:JetBrains Mono,monospace;font-size:10px;color:var(--amber)">'+r.kcal+'</span></div>'
+      + '<div class="prog-bar"><div class="prog-fill pf-amber" style="width:'+kcalPct+'%"></div></div></div>'
+      // Wasser
+      + '<div><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span style="color:var(--text2)">Wasser</span><span style="font-family:JetBrains Mono,monospace;font-size:10px;color:var(--teal)">'+r.water+'/8</span></div>'
+      + '<div class="prog-bar"><div class="prog-fill pf-teal" style="width:'+waterPct+'%"></div></div></div>'
+      // Schlaf
+      + '<div><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span style="color:var(--text2)">Schlaf</span><span style="font-family:JetBrains Mono,monospace;font-size:10px;color:var(--purple)">'+(r.schlafH||0)+'h</span></div>'
+      + '<div class="prog-bar"><div class="prog-fill pf-purple" style="width:'+Math.min(100,Math.round((r.schlafH||0)/8*100))+'%"></div></div></div>'
+      + '</div>'
+      // Carbs + Fat inline
+      + '<div style="display:flex;gap:10px;font-size:10px;font-family:JetBrains Mono,monospace;color:var(--muted)">'
+      + '<span>Carbs: <span style="color:var(--text2)">'+r.carbs+'g</span></span>'
+      + '<span>Fett: <span style="color:var(--text2)">'+r.fat+'g</span></span>'
+      + '<span>Streak: <span style="color:var(--amber)">'+r.streak+'&#128293;</span></span>'
+      + (r.weight ? '<span>Gewicht: <span style="color:var(--text2)">'+r.weight+'kg</span></span>' : '')
+      + '</div>'
+      + '</div>';
+  }).join('');
+}
+// ─── END VERLAUF ─────────────────────────────────
+
+
+</script>
+</body>
+</html>
